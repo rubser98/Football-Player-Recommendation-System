@@ -16,9 +16,11 @@ if __name__ == "__main__":
     # Load dataset
     data_files = f"{args.dataset_dir}/player2vec_dataset.json"
     dataset = load_dataset('json', data_files=data_files)
-
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     # Initialize model
-    model = SentenceTransformer("distiluse-base-multilingual-cased-v1", device="cuda" if torch.cuda.is_available() else "cpu")
+    model = SentenceTransformer("distiluse-base-multilingual-cased-v1", device=device)
+    tokenizer = model.tokenizer
+    huggingface_model = model._first_module().auto_model
 
     vocab_dict = readJson('action_translations.json')
     vocab = []
@@ -27,8 +29,8 @@ if __name__ == "__main__":
             tokens = t.split()
             vocab = vocab + tokens
     vocab = list(set(vocab))
-    model.tokenizer.add_tokens(vocab)
-
+    num_added_tokens = tokenizer.add_tokens(vocab)
+    huggingface_model.resize_token_embeddings(len(tokenizer))
 
     # Prepare training examples and DataLoader
     train_examples = dataset['train']['text']
