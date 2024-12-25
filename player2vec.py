@@ -28,7 +28,7 @@ if __name__ == "__main__":
             vocab = vocab + tokens
     vocab = list(set(vocab))
     model.tokenizer.add_tokens(vocab)
-    model.resize_token_embeddings(len(model.tokenizer))
+
 
     # Prepare training examples and DataLoader
     train_examples = dataset['train']['text']
