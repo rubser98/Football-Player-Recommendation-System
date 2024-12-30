@@ -61,7 +61,7 @@ if __name__ == '__main__':
     """
 
     model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
-    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_4bit=True)
+    model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_8bit=True)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
