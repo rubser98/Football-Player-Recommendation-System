@@ -27,9 +27,10 @@ if __name__ == '__main__':
     #p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
-    players_path = 'Dataset/Events2Text/TeamPlayerList'
-    players_dict = getPlayersDict(players_path)
-    player_name = players_dict[str(p)]
+    #players_path = 'Dataset/Events2Text/TeamPlayerList'
+    #players_dict = getPlayersDict(players_path)
+    #player_name = players_dict[str(p)]
+    player_name = 'Rafael Leao'
 
     results = avg_collection.get(where={'playerId': p}, include=['embeddings'])['embeddings']
 
@@ -37,11 +38,12 @@ if __name__ == '__main__':
     top_k_docs = collection.query(query_embeddings= results, n_results=k)
     doc = top_k_docs["documents"]
 
+    '''
     top_k_players = avg_collection.query(query_embeddings = results, n_results=k)
     for kp in top_k_players['metadatas'][0]:
         #print(kp, kp['playerId'])
         print(players_dict[str(kp['playerId'])])
-
+    '''
 
     prompt = f"""[INST]
     Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.

@@ -3,6 +3,7 @@ from chromadb import Documents, EmbeddingFunction, Embeddings
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from datasets import load_dataset
+import argparse
 
 class PlayerEmbeddingFunction(EmbeddingFunction):
     def __init__(self, model_path: str):
@@ -15,10 +16,16 @@ class PlayerEmbeddingFunction(EmbeddingFunction):
         return embeddings
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Store player embeddings into chroma db")
+    parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
+    parser.add_argument("--model_dir", type=str, required=True, help="Path to the directory where the model is stored.")
+    parser.add_argument("--output_dir", type=str, required=True, help="Path to the directory where the chromadb is stored.")
+    args = parser.parse_args()
 
-    embedding_function = PlayerEmbeddingFunction(model_path="Model_v2/Model")
+    #"Model_v2/Model"
+    embedding_function = PlayerEmbeddingFunction(model_path=args.model_dir)
 
-    client = chromadb.PersistentClient(path="VectorDB")
+    client = chromadb.PersistentClient(path=args.output_dir)
 
     # Crea una collection usando la funzione di embedding personalizzata
     collection = client.get_or_create_collection(
@@ -26,7 +33,7 @@ if __name__ == '__main__':
         embedding_function=embedding_function
     )
 
-    dataset = load_dataset('json', data_files='Dataset/Events2Text/player2vec_dataset.json')
+    dataset = load_dataset('json', data_files=f'{args.dataset_dir}/player2vec_dataset.json')
     columns = list(dataset.column_names.values())[0]
     columns.remove('text')
     texts = dataset['train']['text']
