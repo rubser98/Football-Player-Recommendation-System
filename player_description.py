@@ -59,6 +59,39 @@ if __name__ == '__main__':
     Zone del campo predilette:
     """
 
+    prompt = """
+    Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
+
+    1. **Punti di forza**: descrivi le aree in cui il giocatore eccelle, basandoti sui dati forniti.
+    2. **Debolezze**: individua i limiti o le difficoltà del giocatore, considerando le informazioni disponibili.
+    3. **Caratteristiche principali**: riassumi lo stile di gioco generale del giocatore, indicando ruolo, posizione preferita e peculiarità tecnico-tattiche.
+
+    ### Input dati del giocatore:
+
+    Nome giocatore: {player_name}
+    Squadra: {team_name}
+    Top 5 documenti più simili all'embedding medio:
+  
+    {doc}
+
+    ### Formato di output richiesto:
+
+    #### Nome giocatore: {player_name}
+
+    1. **Punti di forza:**
+    - [Descrizione sintetica del primo punto di forza, es. precisione nei passaggi]
+    - [Descrizione sintetica del secondo punto di forza]
+
+    2. **Debolezze:**
+    - [Descrizione sintetica della prima debolezza, es. difficoltà nei contrasti]
+    - [Descrizione sintetica della seconda debolezza]
+
+    3. **Caratteristiche principali:**
+    - Ruolo e posizione preferita: [Es. "Centrocampista difensivo"]
+    - Stile di gioco: [Es. "Giocatore creativo, con visione di gioco e abilità nei passaggi lunghi"]
+    - Peculiarità tecniche: [Es. "Ambidestro, ottimo nei tiri da fuori area"]
+    """
+
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
     #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
     model_name = "galatolo/cerbero-7b"
