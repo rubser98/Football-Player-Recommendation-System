@@ -59,7 +59,7 @@ if __name__ == '__main__':
     Zone del campo predilette:
     """
 
-    prompt = """
+    prompt = f"""
     Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
 
     1. **Punti di forza**: descrivi le aree in cui il giocatore eccelle, basandoti sui dati forniti.
@@ -69,7 +69,6 @@ if __name__ == '__main__':
     ### Input dati del giocatore:
 
     Nome giocatore: {player_name}
-    Squadra: {team_name}
     Top 5 documenti più simili all'embedding medio:
   
     {doc}
