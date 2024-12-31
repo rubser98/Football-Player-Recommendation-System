@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     results = avg_collection.get(where={'playerId': p}, include=['embeddings'])['embeddings']
 
-    k = 10
+    k = 5
     top_k_docs = collection.query(query_embeddings= results, n_results=k)
     doc = top_k_docs["documents"]
 
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
     with torch.no_grad():
         outputs = model.generate(input_ids=input_ids, max_new_tokens=200)
+    
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
