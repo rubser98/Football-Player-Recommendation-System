@@ -24,8 +24,8 @@ if __name__ == '__main__':
     avg_client = chromadb.PersistentClient(path="AVG_PLAYER_VECTORDB")
     avg_collection = client.get_collection(name="average_player_embeddings")
 
-    p = 349207.0 #Rafa Leao
-    #p = 303115.0 #Theo
+    #p = 349207.0 #Rafa Leao
+    p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
