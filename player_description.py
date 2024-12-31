@@ -1,7 +1,8 @@
 import chromadb
 import os
 import utils
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 def getPlayersDict(path: str) -> set:
     players_list = {}
@@ -45,7 +46,7 @@ if __name__ == '__main__':
         print(players_dict[str(kp['playerId'])])
     '''
 
-    prompt = f"""[INST]
+    prompt = f"""
     Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
     Ecco una lista di documenti che descrivono le azioni fatte durante le partite: 
         {doc}
@@ -57,15 +58,19 @@ if __name__ == '__main__':
     Punti di forza:
     Debolezze:
     Zone del campo predilette:
-    [/INST]
     """
 
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
-    model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+    #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+    model_name = "galatolo/cerbero-7b"
     model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", load_in_8bit=True)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-    outputs = model.generate(input_ids=input_ids, max_new_tokens=200)
-    print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
+    with torch.no_grad():
+        outputs = model.generate(input_ids=input_ids, max_new_tokens=200)
+    
+    #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
+    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    print(generated_text)
 
