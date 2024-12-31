@@ -53,7 +53,6 @@ if __name__ == '__main__':
 
     Restituisci il report nel seguente formato:
 
-    Giocatore : {player_name}
     Caratteristiche:
     Punti di forza:
     Debolezze:
