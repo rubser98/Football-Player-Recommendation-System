@@ -27,13 +27,15 @@ if __name__ == '__main__':
 
     client = chromadb.PersistentClient(path=args.output_dir)
 
+    collection_name = "team_embeddings"
     # Crea una collection usando la funzione di embedding personalizzata
     collection = client.get_or_create_collection(
-        name="player_embeddings",
+        name=collection_name,
         embedding_function=embedding_function
     )
 
-    dataset = load_dataset('json', data_files=f'{args.dataset_dir}/player2vec_dataset.json')
+    nome_file = 'team2vec_dataset.json'
+    dataset = load_dataset('json', data_files=f'{args.dataset_dir}/{nome_file}')
     columns = list(dataset.column_names.values())[0]
     columns.remove('text')
     texts = dataset['train']['text']
