@@ -56,40 +56,42 @@ if __name__ == '__main__':
 
     client = chromadb.PersistentClient(path=args.vector_store_dir)
 
-    collection_name = "team_embeddings"  
+    collection_name = "player_embeddings"  
     collection = client.get_collection(name=collection_name)
 
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
-    #players = getPlayersDict(args.dataset_dir)
-    players = getTeamDict(args.dataset_dir)
+    players = getPlayersDict(args.dataset_dir)
+    #players = getTeamDict(args.dataset_dir)
     seasons = ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024']
     #avg_client = chromadb.PersistentClient(path=args.output_dir)
     embedding_function = PlayerEmbeddingFunction(model_path=args.model_dir)
 
     # Crea una collection usando la funzione di embedding personalizzata
     avg_collection = client.get_or_create_collection(
-        name="average_team_embeddings_version2",
+        name="average_player_embeddings_season",
         embedding_function=embedding_function
     )
 
     results = collection.get(include=["metadatas"], limit=1)
     print(results["metadatas"])
-
+    not_seen_players = []
     with tqdm(total=len(players.keys()), desc="Processing players") as pbar:
 
         for p in players.keys():
                 pbar.update(1)
                 for s in seasons:
                     try:
-                        results = collection.get(where={'$and': [{'teamId': int(p)}, {'season': s}]}, include=['embeddings'])
+                        results = collection.get(where={'$and': [{'playerId': float(p)}, {'season': s}]}, include=['embeddings'])
                     
                         avg_player_emb = results['embeddings'].mean(axis=0)
                         avg_collection.upsert(
                             ids = [f'{p}-{s}'],
                             embeddings=[avg_player_emb],
-                            metadatas={'teamId': p, 'teamName': players[p], 'season': s}
+                            metadatas={'id': p, 'name': players[p], 'season': s}
                         )
                     
                     except:
-                        print(players[p],s)
+                       not_seen_players.append((players[p],s))
 
+
+    print(len(not_seen_players),not_seen_players[:10])

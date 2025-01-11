@@ -37,7 +37,7 @@ if __name__ == '__main__':
     client = chromadb.PersistentClient(path="VectorDB")
     collection = client.get_collection(name="player_embeddings")
     #"average_player_embeddings_version2"
-    avg_collection = client.get_collection(name="average_team_embeddings_version2")
+    avg_collection = client.get_collection(name="average_player_embeddings_version2")
 
     #p = 349207.0 #Rafa Leao
     #p = 303115.0 #Theo
@@ -45,24 +45,108 @@ if __name__ == '__main__':
     p = 11119.0 #Messi
     p=31772.0
 
- 
+    #model = PlayerEmbeddingFunction('Model_v2/Model')
+    vocab_collection = client.get_collection(name="vocab")
     players_path = 'Dataset/Events2Text/TeamPlayerList'
     players_dict = getPlayersDict(players_path)
-    player_name = players_dict[str(p)]
+
+    milan = {
+            "349207.0": "Rafael Leão",
+            "303115.0": "Theo Hernández",
+            "141646.0": "Mike Maignan",
+            "393355.0": "Malick Thiaw",
+            "317507.0": "Fikayo Tomori",
+            "294163.0": "Rade Krunic",
+            "343382.0": "Tijjani Reijnders",
+            "24444.0": "Olivier Giroud",
+            "260498.0": "Davide Calabria",
+            "255777.0": "Ruben Loftus-Cheek",
+            "302692.0": "Christian Pulisic",
+            "376090.0": "Noah Okafor",
+            "402123.0": "Tommaso Pobega",
+            "391836.0": "Pierre Kalulu",
+            "363665.0": "Samuel Chukwueze",
+            "20769.0": "Simon Kjær",
+            "400357.0": "Yunus Musah",
+            "101596.0": "Alessandro Florenzi",
+            "315755.0": "Luka Jovic",
+            "95504.0": "Marco Sportiello",
+            "454356.0": "Davide Bartesaghi",
+            "357811.0": "Yacine Adli",
+            "395395.0": "Luka Romero",
+            "17949.0": "Antonio Mirante",
+            "411659.0": "Marco Pellegrino",
+            "510527.0": "Francesco Camarda",
+            "259102.0": "Ismaël Bennacer",
+            "468676.0": "Jan-Carlo Simic",
+            "409261.0": "Chaka Traorè",
+            "492546.0": "Kevin Zeroli",
+            "497295.0": "Álex Jiménez",
+            "337443.0": "Matteo Gabbia",
+            "395782.0": "Filippo Terracciano",
+            "137832.0": "Mattia Caldara",
+            "430632.0": "Lapo Nava"
+        }
+    
+    inter = {
+            "23220.0": "Matteo Darmian",
+            "35758.0": "Yann Sommer",
+            "329665.0": "Alessandro Bastoni",
+            "28421.0": "Henrikh Mkhitaryan",
+            "148684.0": "Nicolò Barella",
+            "82399.0": "Stefan de Vrij",
+            "110373.0": "Hakan Çalhanoglu",
+            "255929.0": "Federico Dimarco",
+            "296322.0": "Marcus Thuram",
+            "322153.0": "Denzel Dumfries",
+            "299344.0": "Lautaro Martínez",
+            "44868.0": "Juan Cuadrado",
+            "357897.0": "Carlos Augusto",
+            "34693.0": "Marko Arnautovic",
+            "331425.0": "Davide Frattesi",
+            "349126.0": "Yann Bisseck",
+            "136306.0": "Stefano Sensi",
+            "423450.0": "Kristjan Asllani",
+            "54968.0": "Francesco Acerbi",
+            "259648.0": "Benjamin Pavard",
+            "25244.0": "Alexis Sánchez",
+            "108860.0": "Davy Klaassen",
+            "388505.0": "Lucien Agoumé",
+            "254692.0": "Emil Audero",
+            "482453.0": "Ebenezer Akinsanmiro",
+            "371027.0": "Tajon Buchanan",
+            "122963.0": "Raffaele Di Gennaro"
+        }
+
+    new_prompt = """Sei un football match analyst esperto. 
+    Ho bisogno che mi crei un report per una squadra di calcio basandoti sulle azioni compiute dai giocatori che la compongono. 
+    Utilizza queste informazioni per analizzare le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
+    I giocatori sono elencati in ordine dal più utilizzato al meno utilizzato. Nel report non specificare nomi dei giocatori.
+    La lista delle azioni per ciascun giocatore è fornita qui sotto:
+    """
 
 
-    p='75'
-    players_dict = getTeamDict(players_path)
-    player_name =  players_dict[str(p)]
-    print(player_name)
-    results = avg_collection.get(include=["metadatas"], limit=1)
-    print(results["metadatas"])
+    for p in inter.keys():
+
+        player_name = players_dict[str(p)]
+        try:
+            results = avg_collection.get(where={'playerId': str(p)}, include=['embeddings'])['embeddings']
+            vocab_results = vocab_collection.query(query_embeddings=results, n_results = 10, include=['documents'])
+            actions = vocab_results['documents'][0]
+            f_string = f'- {player_name}: {actions}\n'
+            new_prompt+= f_string
+        except:
+            print(player_name)
+
+    print(new_prompt)
+
+
+
     
 
-    #results = avg_collection.get(where={'playerId': str(p)}, include=['embeddings'])['embeddings']
-    results = avg_collection.get(where={'$and': [{'teamId': p}, {'season': '2022-2023'}]}, include=['embeddings'])['embeddings']
     
-    print(results.shape)
+    #results = avg_collection.get(where={'$and': [{'teamId': p}, {'season': '2022-2023'}]}, include=['embeddings'])['embeddings']
+    
     k = 10
     top_k_docs = collection.query(query_embeddings= results, n_results=k)
     doc = top_k_docs["documents"]
@@ -78,15 +162,12 @@ if __name__ == '__main__':
         i+=1
     '''
     j=0
-    model = PlayerEmbeddingFunction('Model_v2/Model')
-    vocab_collection = client.get_collection(
-            name="vocab",
-            embedding_function=model
-        )  
+
     if j > 0:
         total_vocab = getTotalVocab()
         for i in range(len(total_vocab)):
             vocab_collection.add(ids=[str(i)], documents=[total_vocab[i]])
+            
 
     
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = 20, include=['documents'])
@@ -118,7 +199,7 @@ if __name__ == '__main__':
     Debolezze:
     Zone del campo predilette:
     """
-    print(prompt_team)
+    #print(prompt_team)
 
     prompt = f"""
     Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
