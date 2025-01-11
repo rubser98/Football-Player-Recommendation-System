@@ -17,7 +17,9 @@ def getPlayersList(path: str) -> set:
     players_list = [float(player) if '.' in player else int(player) for player in players_list]
     return set(players_list) - {0.0}
 
-def getPlayersDict(path: str) -> set:
+
+
+def getPlayersDict(path: str) -> dict:
     players_list = {}
     #for file in os.listdir(path):
     for file in os.listdir(path):
@@ -32,7 +34,7 @@ def getPlayersDict(path: str) -> set:
 
     return players_list
 
-def getTeamDict(path: str) -> set:
+def getTeamDict(path: str) -> dict:
     team_list = {}
     #for file in os.listdir(path):
     for file in os.listdir(path):
