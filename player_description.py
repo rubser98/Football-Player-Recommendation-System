@@ -119,8 +119,8 @@ if __name__ == '__main__':
     player_collection = client.get_collection(name="average_player_embeddings_version2")
     player_season_collection = client.get_collection(name="average_player_embeddings_season")
 
-    #records = player_season_collection.get(limit=1)
-    #print(records['metadatas'])
+    records = player_collection.get(limit=1)
+    print(records['metadatas'])
     p = 349207.0 #Rafa Leao
     #p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
