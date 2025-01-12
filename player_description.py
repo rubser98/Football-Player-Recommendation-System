@@ -181,6 +181,7 @@ if __name__ == '__main__':
     """
     '''
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
+    
     login()
     model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
     #model_name = "galatolo/cerbero-7b"
@@ -196,7 +197,8 @@ if __name__ == '__main__':
     with torch.no_grad():
         outputs = model.generate(input_ids=input_ids, max_new_tokens=200)
     
+    print(len(outputs))
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(generated_text)
+    #print(generated_text)
