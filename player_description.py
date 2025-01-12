@@ -83,7 +83,7 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
 def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20):
 
     player_name = players_dict[p]
-    results = player_collection.get(where={'playerId': str(p)}, include=['embeddings'])['embeddings']
+    results = player_collection.get(where={'id': str(p)}, include=['embeddings'])['embeddings']
     print('eo')
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
     print('oe')
