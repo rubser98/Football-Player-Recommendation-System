@@ -195,8 +195,10 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
+    attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
+
     with torch.no_grad():
-        outputs = model.generate(input_ids=input_ids, max_new_tokens=2000)
+        outputs = model.generate(input_ids=input_ids,attention_mask=attention_mask, max_new_tokens=2000, pad_token_id=tokenizer.eos_token_id)
     
     print(len(outputs))
     
