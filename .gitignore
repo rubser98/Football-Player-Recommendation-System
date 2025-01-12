@@ -3,3 +3,4 @@ Model*
 VectorDB
 AVG_PLAYER_VECTORDB
 offload_weights
+__pycache__
