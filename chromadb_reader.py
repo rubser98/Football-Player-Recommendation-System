@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser.add_argument("--vector_store_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--model_dir", type=str, required=True, help="Path to the directory where the model is stored.")
-    parser.add_argument("--season_run", type=int, required=True)
+    parser.add_argument("--season_run", type=int, required=True, help="Coordinate storing season average player embeddings or overall")
     args = parser.parse_args()
 
     client = chromadb.PersistentClient(path=args.vector_store_dir)
@@ -70,12 +70,14 @@ if __name__ == '__main__':
     embedding_function = PlayerEmbeddingFunction(model_path=args.model_dir)
     season_run = args.season_run
     if season_run == 1:
+        print('Storing embeddings averaging over seasons')
         # Crea una collection usando la funzione di embedding personalizzata
         avg_collection = client.get_or_create_collection(
             name="average_player_embeddings_season",
             embedding_function=embedding_function
         )
     else:
+        print('Storing embeddings averaging overall')
         avg_collection = client.get_or_create_collection(
             name="average_player_embeddings_version2",
             embedding_function=embedding_function
