@@ -7,6 +7,7 @@ from chromadb_ingestion import PlayerEmbeddingFunction
 import argparse
 from chromadb_reader import getTeamDict
 import pandas as pd
+from huggingface_hub import login
 
 
 def getPlayersDict(path: str) -> set:
@@ -84,9 +85,7 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
 
     player_name = players_dict[p]
     results = player_collection.get(where={'id': str(p)}, include=['embeddings'])['embeddings']
-    print('eo')
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
-    print('oe')
     prompt = f"""
     Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
     Ecco una lista di documenti che descrivono le azioni fatte durante le partite: 
@@ -182,6 +181,7 @@ if __name__ == '__main__':
     """
     '''
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
+    login()
     model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
     #model_name = "galatolo/cerbero-7b"
     model = AutoModelForCausalLM.from_pretrained(
