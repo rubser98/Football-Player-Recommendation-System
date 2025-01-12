@@ -182,8 +182,8 @@ if __name__ == '__main__':
     """
     '''
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
-    #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
-    model_name = "galatolo/cerbero-7b"
+    model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+    #model_name = "galatolo/cerbero-7b"
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto", 
