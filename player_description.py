@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
     with torch.no_grad():
-        outputs = model.generate(input_ids=input_ids, max_new_tokens=200)
+        outputs = model.generate(input_ids=input_ids, max_new_tokens=2000)
     
     print(len(outputs))
     
