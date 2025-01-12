@@ -60,7 +60,8 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
     prompt_team = """Sei un football match analyst esperto. 
     Ho bisogno che mi crei un report per una squadra di calcio basandoti sulle azioni compiute dai giocatori che la compongono. 
     Utilizza queste informazioni per analizzare le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
-    I giocatori sono elencati in ordine dal più utilizzato al meno utilizzato. Nel report non specificare nomi dei giocatori.
+    Per ogni giocatore è indicato il numero di presenze. Più è alto il numero delle presenze e maggiore sarà il suo contributo nello stile di gioco della squadra.
+    Nel report non specificare nomi dei giocatori.
     La lista delle azioni per ciascun giocatore è fornita qui sotto:
     """
 
@@ -71,7 +72,7 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
             results = player_collection.get(where={'$and':[{'id': p}, {'season': season}]}, include=['embeddings'])['embeddings']
             vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
             actions = vocab_results['documents'][0]
-            presenze = getPresence(df_presenze, float(p), season)
+            presenze = getAppearances(df_presenze, float(p), season)
             f_string = f'- {player_name}: presenze: {presenze}, caratteristiche: {actions}\n'
             prompt_team += f_string
         except:
@@ -100,7 +101,7 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
     """
     return prompt
 
-def getPresence(df_dataset: pd.DataFrame, p: str, season: str) -> int:
+def getAppearances(df_dataset: pd.DataFrame, p: str, season: str) -> int:
     df_presence = df_dataset[(df_dataset['playerId'] == p) & (df_dataset['season'] == season)]['row_count']
     return int(df_presence.loc[df_presence.index[0]])
 
@@ -137,12 +138,15 @@ if __name__ == '__main__':
     prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
     #print(prompt)
 
-    team_dict = getTeamsPlayerDict(args.dataset_dir)
-    team = team_dict['2021-2022']['80']['players']
-    team_prompt = prompt_team_description(team, '2021-2022', players_dict, player_season_collection, vocab_collection, player_season_counts)
+    isTeam = False
+    
+    if isTeam:
+        team_dict = getTeamsPlayerDict(args.dataset_dir)
+        team = team_dict['2021-2022']['80']['players']
+        team_prompt = prompt_team_description(team, '2021-2022', players_dict, player_season_collection, vocab_collection, player_season_counts)
     #print(team_prompt)
 
-    '''
+    
 
     prompt = f"""
     Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
@@ -195,5 +199,3 @@ if __name__ == '__main__':
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     print(generated_text)
-
-    '''
