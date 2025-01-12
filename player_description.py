@@ -139,14 +139,14 @@ if __name__ == '__main__':
     #print(prompt)
 
     isTeam = False
-    
+
     if isTeam:
         team_dict = getTeamsPlayerDict(args.dataset_dir)
         team = team_dict['2021-2022']['80']['players']
         team_prompt = prompt_team_description(team, '2021-2022', players_dict, player_season_collection, vocab_collection, player_season_counts)
     #print(team_prompt)
 
-    
+    '''
 
     prompt = f"""
     Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     - Stile di gioco: [Es. "Giocatore creativo, con visione di gioco e abilità nei passaggi lunghi"]
     - Peculiarità tecniche: [Es. "Ambidestro, ottimo nei tiri da fuori area"]
     """
-    
+    '''
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
     #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
     model_name = "galatolo/cerbero-7b"
