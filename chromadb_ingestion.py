@@ -4,15 +4,20 @@ from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from datasets import load_dataset
 import argparse
+import torch
 
 class PlayerEmbeddingFunction(EmbeddingFunction):
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: str, use_gpu: bool = True):
         # Inizializza il modello fine-tunato
         self.model = SentenceTransformer(model_path)
+        if use_gpu and torch.cuda.is_available():
+            self.model = self.model.to("cuda")
+        elif use_gpu:
+             print("GPU richiesta, ma non disponibile. Il modello verrà eseguito su CPU.")
 
     def __call__(self, input: Documents) -> Embeddings:
         # Calcola gli embeddings usando il modello
-        embeddings = self.model.encode(input).tolist()  # Converte gli embeddings in formato lista
+        embeddings = self.model.encode(input, device="cuda" if torch.cuda.is_available() else "cpu").tolist()  # Converte gli embeddings in formato lista
         return embeddings
 
 if __name__ == '__main__':
