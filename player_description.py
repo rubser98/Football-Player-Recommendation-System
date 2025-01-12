@@ -88,7 +88,7 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
     prompt = f"""
     Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
-    Ecco una lista di documenti che descrivono le azioni fatte durante le partite: 
+    Ecco una lista di azioni fatte durante le partite che meglio descrivono il giocatore: 
         {vocab_results['documents']}
 
     Restituisci il report nel seguente formato:
