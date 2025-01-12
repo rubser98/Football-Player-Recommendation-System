@@ -201,4 +201,6 @@ if __name__ == '__main__':
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(generated_text)
+    with open('prova_report_leao.txt', 'w') as f:
+        f.write(generated_text)
+
