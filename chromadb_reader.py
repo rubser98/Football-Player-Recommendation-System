@@ -54,6 +54,7 @@ if __name__ == '__main__':
     parser.add_argument("--vector_store_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--model_dir", type=str, required=True, help="Path to the directory where the model is stored.")
+    parser.add_argument("--season_run", type=int, required=True)
     args = parser.parse_args()
 
     client = chromadb.PersistentClient(path=args.vector_store_dir)
@@ -67,33 +68,44 @@ if __name__ == '__main__':
     seasons = ['2019-2020', '2020-2021', '2021-2022', '2022-2023', '2023-2024']
     #avg_client = chromadb.PersistentClient(path=args.output_dir)
     embedding_function = PlayerEmbeddingFunction(model_path=args.model_dir)
-
-    # Crea una collection usando la funzione di embedding personalizzata
-    avg_collection = client.get_or_create_collection(
-        name="average_player_embeddings_season",
-        embedding_function=embedding_function
-    )
-
-    results = collection.get(include=["metadatas"], limit=1)
-    print(results["metadatas"])
+    season_run = args.season_run
+    if season_run == 1:
+        # Crea una collection usando la funzione di embedding personalizzata
+        avg_collection = client.get_or_create_collection(
+            name="average_player_embeddings_season",
+            embedding_function=embedding_function
+        )
+    else:
+        avg_collection = client.get_or_create_collection(
+            name="average_player_embeddings_version2",
+            embedding_function=embedding_function
+        )
+    #results = collection.get(include=["metadatas"], limit=1)
+    #print(results["metadatas"])
     not_seen_players = []
     with tqdm(total=len(players.keys()), desc="Processing players") as pbar:
 
         for p in players.keys():
                 pbar.update(1)
-                for s in seasons:
-                    try:
-                        results = collection.get(where={'$and': [{'playerId': float(p)}, {'season': s}]}, include=['embeddings'])
-                    
-                        avg_player_emb = results['embeddings'].mean(axis=0)
-                        avg_collection.upsert(
-                            ids = [f'{p}-{s}'],
-                            embeddings=[avg_player_emb],
-                            metadatas={'id': p, 'name': players[p], 'season': s}
-                        )
-                    
-                    except:
-                       not_seen_players.append((players[p],s))
-
-
-    print(len(not_seen_players),not_seen_players[:10])
+                if season_run == 1:
+                    for s in seasons:
+                        try:
+                            results = collection.get(where={'$and': [{'playerId': float(p)}, {'season': s}]}, include=['embeddings'])
+                        
+                            avg_player_emb = results['embeddings'].mean(axis=0)
+                            avg_collection.upsert(
+                                ids = [f'{p}-{s}'],
+                                embeddings=[avg_player_emb],
+                                metadatas={'id': p, 'name': players[p], 'season': s}
+                            )
+                        
+                        except:
+                            continue
+                else:
+                    results = collection.get(where={'playerId': float(p)}, include=['embeddings'])
+                    avg_player_emb = results['embeddings'].mean(axis=0)
+                    avg_collection.upsert(
+                        ids = [p],
+                        embeddings=[avg_player_emb],
+                        metadatas={'id': p, 'name': players[p]}
+                    )
