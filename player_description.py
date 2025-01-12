@@ -126,7 +126,8 @@ if __name__ == '__main__':
     #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
 
-    dir = 'Dataset/Events2Text'
+    #dir = 'Dataset/Events2Text'
+    dir = 'Dataset'
     df_dataset = pd.read_json(f'{dir}/player2vec_dataset.json')
     player_season_counts = df_dataset.groupby(['playerId', 'playerName', 'season']).size().reset_index(name='row_count')
 
