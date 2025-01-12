@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     client = chromadb.PersistentClient(path=args.vector_store_dir)
     model = PlayerEmbeddingFunction(args.model_dir)
-    vocab_collection = client.get_collection(name="vocab", embedding_function=model)
+    vocab_collection = client.get_or_create_collection(name="vocab", embedding_function=model)
     total_vocab = getTotalVocab()
 
     for i in range(len(total_vocab)):
