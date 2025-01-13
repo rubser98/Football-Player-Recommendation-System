@@ -217,7 +217,8 @@ if __name__ == '__main__':
         outputs = model.generate(input_ids=input_ids,
                                  #attention_mask=attention_mask, 
                                  max_new_tokens=2000, 
-                                 pad_token_id=tokenizer.eos_token_id)
+                                 #pad_token_id=tokenizer.eos_token_id
+                                 )
     
     print(len(outputs), outputs.shape)
     
