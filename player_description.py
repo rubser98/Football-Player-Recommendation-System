@@ -215,7 +215,7 @@ if __name__ == '__main__':
 
     with torch.no_grad():
         outputs = model.generate(input_ids=input_ids,
-                                 #attention_mask=attention_mask, 
+                                 attention_mask=attention_mask, 
                                  max_new_tokens=2000, 
                                  #pad_token_id=tokenizer.eos_token_id
                                  )
