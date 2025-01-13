@@ -7,7 +7,7 @@ from chromadb_ingestion import PlayerEmbeddingFunction
 import argparse
 from chromadb_reader import getTeamDict
 import pandas as pd
-from huggingface_hub import login
+
 
 
 def getPlayersDict(path: str) -> set:
@@ -135,8 +135,18 @@ if __name__ == '__main__':
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
     players_dict = getPlayersDict(args.dataset_dir)
 
-    prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
+    #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
     #print(prompt)
+    prompt= """
+    You are a football scout. I need you to create a report for player Rafael Leao, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
+    Here is a list of action describing the playing style performed during the matches:
+    ["shot off target from inside the attacking area, left center", "shot off target from inside the attacking area, right center", "shot from the penalty area, left center", "save outside the penalty area, left center", "shot from the penalty area, right center", "save outside the penalty area, right center", "shot from the six-yard box, left center", "action performed with a body part other than the feet, left center", "save on a shot from outside the penalty area, left center", "offensive action, left center", "counterattack action, left center", "save on a shot from outside the penalty area, right center", "blocked shot, left center", "offensive action, right center", "action performed with the feet, left center", "shot from the six-yard box, right center", "save inside the penalty area, left center", "blocked action, left center", "counterattack action, right center", "shot off target from inside the attacking area, central"]]
+    Provide the report in the following format:
+        Characteristics:
+        Strengths:
+        Weaknesses:
+        Preferred areas of the field: 
+    """
 
     isTeam = False
 
@@ -183,8 +193,8 @@ if __name__ == '__main__':
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
     
     #login()
-    model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
-    #model_name = 'meta-llama/Llama-3.2-3B'
+    #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+    model_name = 'meta-llama/Llama-3.2-3B'
     #model_name = "galatolo/cerbero-7b"
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
