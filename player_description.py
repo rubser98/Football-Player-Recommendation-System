@@ -199,8 +199,8 @@ if __name__ == '__main__':
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         device_map="auto", 
-        #load_in_8bit=True, 
-        #llm_int8_enable_fp32_cpu_offload=True,
+        load_in_8bit=True, 
+        llm_int8_enable_fp32_cpu_offload=True,
         offload_folder='offload_weights')
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -224,6 +224,6 @@ if __name__ == '__main__':
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    with open('prova_report_leao.txt', 'w') as f:
+    with open('prova_report_leao_qnt.txt', 'w') as f:
         f.write(generated_text)
 
