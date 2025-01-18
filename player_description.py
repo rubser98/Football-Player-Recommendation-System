@@ -149,6 +149,18 @@ if __name__ == '__main__':
     ###
     """
 
+    prompt = """Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per Rafael Leao evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.  
+    Ecco una lista di documenti che descrivono le azioni fatte durante le partite: 
+    [["tiro fuori bersaglio dall'interno dell'area attacco, centro sinistra", "tiro fuori bersaglio dall'interno dell'area attacco, centro destra", "tiro dall'area di rigore attacco, centro sinistra", "parata fuori dall'area di rigore attacco, centro sinistra", "tiro dall'area di rigore attacco, centro destra", "parata fuori dall'area di rigore attacco, centro destra", "tiro dall'area piccola attacco, centro sinistra", 'azione eseguita con una parte del corpo diversa attacco, centro sinistra', 'parata su tiro fuori area attacco, centro sinistra', 'azione offensiva attacco, centro sinistra', 'azione di contropiede attacco, centro sinistra', 'parata su tiro fuori area attacco, centro destra', 'tiro bloccato attacco, centro sinistra', 'azione offensiva attacco, centro destra', 'azione eseguita con i piedi attacco, centro sinistra', "tiro dall'area piccola attacco, centro destra", "parata nell'area di rigore attacco, centro sinistra", 'azione bloccata attacco, centro sinistra', 'azione di contropiede attacco, centro destra', "tiro fuori bersaglio dall'interno dell'area attacco, centrale"]]
+
+    Restituisci il report nel seguente formato:
+        Caratteristiche:
+        Punti di forza:
+        Debolezze:
+        Zone del campo predilette:
+    ###
+    """
+
     isTeam = False
 
     if isTeam:
@@ -225,6 +237,6 @@ if __name__ == '__main__':
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###")[1]
-    with open('prova_report_leao_qnt.txt', 'w') as f:
+    with open('prova_report_leao_qnt_it.txt', 'w') as f:
         f.write(generated_text)
 
