@@ -11,10 +11,12 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", type=str, required=True, help="Path to the directory where the model will be saved.")
     parser.add_argument("--batch_size", type=int, default=30, help="Batch size for training.")
     parser.add_argument("--epochs", type=int, default=10, help="Number of epochs for training.")
+    parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     args = parser.parse_args()
 
     # Load dataset
-    data_files = f"{args.dataset_dir}/player2vec_dataset.json"
+
+    data_files = f"{args.dataset_dir}/player2vec_dataset_{args.lang}.json"
     dataset = load_dataset('json', data_files=data_files)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # Initialize model
@@ -22,7 +24,7 @@ if __name__ == "__main__":
     tokenizer = model.tokenizer
     huggingface_model = model._first_module().auto_model
 
-    vocab_dict = readJson('action_translations.json')
+    vocab_dict = readJson('action_translations.json')[args.lang]
     vocab = []
     for v in vocab_dict.values():
         for t in v.values():
