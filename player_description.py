@@ -56,15 +56,21 @@ def getTeamsPlayerDict(path: str) -> set:
     return team_list
 
 
-def prompt_team_description(team : dict, season:str, players_dict : dict, player_collection : chromadb.Collection, vocab_collection : chromadb.Collection, df_presenze: pd.DataFrame, k: int = 10) -> str:
+def prompt_team_description(team : dict, season:str, players_dict : dict, player_collection : chromadb.Collection, vocab_collection : chromadb.Collection, df_presenze: pd.DataFrame, k: int = 10, lang: str = 'en') -> str:
     
-    prompt_team = """Sei un football match analyst esperto. 
-    Ho bisogno che mi crei un report per una squadra di calcio basandoti sulle azioni compiute dai giocatori che la compongono. 
-    Utilizza queste informazioni per analizzare le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
-    Per ogni giocatore è indicato il numero di presenze. Più è alto il numero delle presenze e maggiore sarà il suo contributo nello stile di gioco della squadra.
-    Nel report non specificare nomi dei giocatori.
-    La lista delle azioni per ciascun giocatore è fornita qui sotto:
-    """
+    if lang == 'it':
+        prompt_team = """Sei un football match analyst esperto. 
+        Ho bisogno che mi crei un report per una squadra di calcio basandoti sulle azioni compiute dai giocatori che la compongono. 
+        Utilizza queste informazioni per analizzare le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
+        Per ogni giocatore è indicato il numero di presenze. Più è alto il numero delle presenze e maggiore sarà il suo contributo nello stile di gioco della squadra.
+        Nel report non specificare nomi dei giocatori.
+        La lista delle azioni per ciascun giocatore è fornita qui sotto:
+        """
+    elif lang == 'en':
+        prompt_team = """
+        """
+    else:
+        raise KeyError("Linguaggio non supportato")
 
     for p in team.keys():
 
@@ -81,23 +87,40 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
 
     return prompt_team
 
-def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20):
+def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20, lang: str = 'en'):
 
     player_name = players_dict[p]
     results = player_collection.get(where={'id': str(p)}, include=['embeddings'])['embeddings']
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
-    prompt = f"""
-    Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
-    Ecco una lista di azioni fatte durante le partite che meglio descrivono il giocatore: 
+    if lang == 'it':
+        prompt = f"""
+        Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
+        Ecco una lista di azioni fatte durante le partite che meglio descrivono il giocatore: 
+            {vocab_results['documents']}
+
+        Restituisci il report nel seguente formato:
+
+        Caratteristiche:
+        Punti di forza:
+        Debolezze:
+        Zone del campo predilette:
+
+        """
+    elif lang == 'en':
+        prompt = f"""
+        You are a football scout. I need you to create a report for player {player_name}, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
+        Here is a list of action describing the playing style performed during the matches:
         {vocab_results['documents']}
-
-    Restituisci il report nel seguente formato:
-
-    Caratteristiche:
-    Punti di forza:
-    Debolezze:
-    Zone del campo predilette:
-    """
+        Provide the report in the following format:
+            Characteristics:
+            Strengths:
+            Weaknesses:
+            Preferred areas of the field: 
+        ###
+        """
+    else:
+        raise KeyError('Linguaggio non supportato')
+        
     return prompt
 
 def getAppearances(df_dataset: pd.DataFrame, p: str, season: str) -> int:
@@ -109,13 +132,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
     parser.add_argument("--vector_store_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
+    parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     args = parser.parse_args()
     #vector store che contiene documenti ed embeddings di tutti i documenti (i.e. player-match)
     client = chromadb.PersistentClient(path=args.vector_store_dir)
-    vocab_collection = client.get_collection(name="vocab")
+    vocab_name = "vocab" if args.lang == 'it' else "vocab_en"
+    vocab_collection = client.get_collection(name=vocab_name)
     #"average_player_embeddings_version2"
-    player_collection = client.get_collection(name="average_player_embeddings_version2")
-    player_season_collection = client.get_collection(name="average_player_embeddings_season")
+    player_collection = client.get_collection(name= f"average_player_embeddings_{args.lang}")
+    #player_season_collection = client.get_collection(name=f"average_player_embeddings_season_{args.lang}")
 
     #records = player_collection.get(limit=1)
     #print(records['metadatas'])
@@ -124,18 +149,18 @@ if __name__ == '__main__':
     #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
 
-    #dir = 'Dataset/Events2Text'
-    dir = 'Dataset'
-    df_dataset = pd.read_json(f'{dir}/player2vec_dataset.json')
+    dir = 'Dataset/Events2Text' if args.lang == 'it' else 'Dataset/Events2TextEN'
+    #dir = 'Dataset'
+    filename = 'player2vec_dataset.json' if args.lang == 'it' else 'player2vec_dataset_en.json'
+    df_dataset = pd.read_json(f'{dir}/{filename}')
     player_season_counts = df_dataset.groupby(['playerId', 'playerName', 'season']).size().reset_index(name='row_count')
 
-    #model = PlayerEmbeddingFunction('Model_v2/Model')
-    vocab_collection = client.get_collection(name="vocab")
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
     players_dict = getPlayersDict(args.dataset_dir)
 
-    #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
-    #print(prompt)
+    prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
+    print(prompt)
+    '''
     prompt= """
     You are a football scout. I need you to create a report for player Rafael Leao, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
     Here is a list of action describing the playing style performed during the matches:
@@ -160,7 +185,7 @@ if __name__ == '__main__':
         Zone del campo predilette:
     ###
     """
-
+    '''
     isTeam = False
 
     if isTeam:
