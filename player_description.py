@@ -112,7 +112,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     #vector store che contiene documenti ed embeddings di tutti i documenti (i.e. player-match)
     client = chromadb.PersistentClient(path=args.vector_store_dir)
-
     vocab_collection = client.get_collection(name="vocab")
     #"average_player_embeddings_version2"
     player_collection = client.get_collection(name="average_player_embeddings_version2")
@@ -146,6 +145,8 @@ if __name__ == '__main__':
         Strengths:
         Weaknesses:
         Preferred areas of the field: 
+    
+    ###
     """
 
     isTeam = False
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     print(len(outputs), outputs.shape)
     
     #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    generated_text = tokenizer.decode(outputs[0].split("###")[1], skip_special_tokens=True)
     with open('prova_report_leao_qnt.txt', 'w') as f:
         f.write(generated_text)
 
