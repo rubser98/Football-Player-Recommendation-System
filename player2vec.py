@@ -17,8 +17,6 @@ if __name__ == "__main__":
     # Load dataset
 
     data_files = f"{args.dataset_dir}/player2vec_dataset_{args.lang}.json"
-    print(data_files)
-    '''
     dataset = load_dataset('json', data_files=data_files)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # Initialize model
@@ -48,4 +46,3 @@ if __name__ == "__main__":
         output_path=args.output_dir,
         show_progress_bar=True
     )
-    '''
