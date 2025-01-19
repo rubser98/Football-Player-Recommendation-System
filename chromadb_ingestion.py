@@ -62,7 +62,7 @@ if __name__ == '__main__':
         batch = texts[i:i + batch_size]
         metadata_batch = metadata[i: i + batch_size]
         ids_batch = ids[i:i + batch_size]
-        collection.add(
+        collection.upsert(
             documents=batch,
             metadatas=metadata_batch,
             ids=ids_batch
