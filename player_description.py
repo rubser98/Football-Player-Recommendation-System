@@ -256,6 +256,10 @@ if __name__ == '__main__':
         outputs = model.generate(input_ids=input_ids,
                                  attention_mask=attention_mask, 
                                  max_new_tokens=2000, 
+                                 temperature=0.7,     # Modifica la temperatura qui
+                                 top_k=50,            # Filtraggio top-k opzionale
+                                 top_p=0.9,           # Nucleus sampling (top-p sampling) opzionale
+                                 do_sample=True 
                                  #pad_token_id=tokenizer.eos_token_id
                                  )
     
