@@ -158,7 +158,7 @@ if __name__ == '__main__':
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
     players_dict = getPlayersDict(args.dataset_dir)
 
-    prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection)
+    prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     print(prompt)
     '''
     prompt= """
