@@ -38,4 +38,4 @@ if __name__ == '__main__':
     total_vocab = getTotalVocab(args.lang)
 
     for i in range(len(total_vocab)):
-        vocab_collection.add(ids=[str(i)], documents=[total_vocab[i]])
+        vocab_collection.upsert(ids=[str(i)], documents=[total_vocab[i]])
