@@ -146,8 +146,9 @@ if __name__ == '__main__':
     #print(records['metadatas'])
     #p = 349207.0 #Rafa Leao
     #p = 303115.0 #Theo
-    p = 300713.0 #Mbappe
+    #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
+    p=141646.0 #maignan
 
     dir = 'Dataset/Events2Text' if args.lang == 'it' else 'Dataset/Events2TextEN'
     dir = 'Dataset'
