@@ -145,8 +145,8 @@ if __name__ == '__main__':
     #records = player_collection.get(limit=1)
     #print(records['metadatas'])
     #p = 349207.0 #Rafa Leao
-    p = 303115.0 #Theo
-    #p = 300713.0 #Mbappe
+    #p = 303115.0 #Theo
+    p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
 
     dir = 'Dataset/Events2Text' if args.lang == 'it' else 'Dataset/Events2TextEN'
