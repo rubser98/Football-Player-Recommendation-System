@@ -4,40 +4,10 @@ import utils
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from chromadb_ingestion import PlayerEmbeddingFunction
-import argparse
-from chromadb_reader import getTeamDict
+import argparse 
 import pandas as pd
-
-
-
-def getPlayersDict(path: str) -> set:
-    players_list = {}
-    #for file in os.listdir(path):
-    for file in os.listdir(path):
-        dict_file = utils.readJson(f'{path}/{file}')
-        for row in dict_file.values():
-            players_list = players_list | row['players']
-            #players_list = players_list + players
-    #players_list = [float(player) if '.' in player else int(player) for player in players_list]
-    return players_list
-
-def getTeamDict(path: str) -> set:
-    team_list = {}
-    #for file in os.listdir(path):
-    for file in os.listdir(path):
-        nazione = file.split('-')[0]
-        season = file.split('_')[1]
-        if season not in team_list.keys():
-            team_list[season] = []
-
-        dict_file = utils.readJson(f'{path}/{file}')
-        for k, v in dict_file.items():
-            if nazione != 'Europa':
-                print(v)
-                break
-                team_list = team_list | new_row
-
-    return team_list
+from chromadb_reader import getPlayersDict, getTeamDict
+from tqdm import tqdm
 
 def getTeamsPlayerDict(path: str) -> set:
     team_list = {}
@@ -132,6 +102,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
     parser.add_argument("--vector_store_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
+    parser.add_argument("--output_dir", type=str, required=True, help="Path to the directory containing the output file.")
     parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     args = parser.parse_args()
     #vector store che contiene documenti ed embeddings di tutti i documenti (i.e. player-match)
@@ -148,8 +119,8 @@ if __name__ == '__main__':
     #p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
     #p = 11119.0 #Messi
-    p=141646.0 #maignan
-    p=480249.0 #yamal
+    #p=141646.0 #maignan
+    #p=480249.0 #yamal
 
     dir = 'Dataset/Events2Text' if args.lang == 'it' else 'Dataset/Events2TextEN'
     dir = 'Dataset'
@@ -160,8 +131,8 @@ if __name__ == '__main__':
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
     players_dict = getPlayersDict(args.dataset_dir)
 
-    prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
-    print(prompt)
+    #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+    #print(prompt)
     '''
     prompt= """
     You are a football scout. I need you to create a report for player Rafael Leao, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
@@ -247,25 +218,40 @@ if __name__ == '__main__':
     # Imposta il token di padding
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token 
-
-    input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-    attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
-
-
-
-    with torch.no_grad():
-        outputs = model.generate(input_ids=input_ids,
-                                 attention_mask=attention_mask, 
-                                 max_new_tokens=2000, 
-                                 temperature=0.2,     # Modifica la temperatura qui
-                                 top_k=50,            # Filtraggio top-k opzionale
-                                 top_p=0.9,           # Nucleus sampling (top-p sampling) opzionale
-                                 do_sample=True 
-                                 #pad_token_id=tokenizer.eos_token_id
-                                 )
     
-    #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)#.split("###")[1]
-    with open('prova_report_leao_qnt_it.txt', 'w') as f:
-        f.write(generated_text)
+    description_dataset = {}
+    with tqdm(total=len(players_dict.keys()), desc="Processing players") as pbar:
+
+        for p in players_dict.keys():
+            pbar.update(1)
+            prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+            input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
+            attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
+
+            with torch.no_grad():
+                outputs = model.generate(input_ids=input_ids,
+                                        attention_mask=attention_mask, 
+                                        max_new_tokens=2000, 
+                                        temperature=0.2,     # Modifica la temperatura qui
+                                        top_k=50,            # Filtraggio top-k opzionale
+                                        top_p=0.9,           # Nucleus sampling (top-p sampling) opzionale
+                                        do_sample=True 
+                                        #pad_token_id=tokenizer.eos_token_id
+                                        )
+            
+            #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
+            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###")[1]
+
+            new_record = {}
+            new_record['name'] = players_dict[p]
+            new_record['prompt'] = prompt
+            new_record['description'] = generated_text
+            
+            description_dataset[p] = new_record
+            print(description_dataset)
+            break
+    
+    utils.writeJson(description_dataset, f'{args.output_dir}/players_description.json')
+    #with open('prova_report_leao_qnt_it.txt', 'w') as f:
+    #    f.write(generated_text)
 
