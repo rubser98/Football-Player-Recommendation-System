@@ -92,7 +92,7 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         prompt = f""""
         You are a professional football scout with expertise in analyzing players' technical and tactical characteristics. 
         I need you to generate a detailed report for a player, based on the provided list of actions that describe their playing style during matches. 
-        Your task is to analyze this data and provide a structured report as follows:
+        Your task is to analyze this data and provide a report as follows:
 
         ### Input Data:
             - Player: {player_name}
@@ -165,7 +165,7 @@ if __name__ == '__main__':
 
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
-    '''
+    
     prompt= """
     You are a football scout. I need you to create a report for player Rafael Leao, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
     Here is a list of action describing the playing style performed during the matches:
