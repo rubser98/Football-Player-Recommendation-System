@@ -179,16 +179,30 @@ if __name__ == '__main__':
     ###
     """
 
-    prompt = """Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per Rafael Leao evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.  
-    Ecco una lista di documenti che descrivono le azioni fatte durante le partite: 
-    [["tiro fuori bersaglio dall'interno dell'area attacco, centro sinistra", "tiro fuori bersaglio dall'interno dell'area attacco, centro destra", "tiro dall'area di rigore attacco, centro sinistra", "parata fuori dall'area di rigore attacco, centro sinistra", "tiro dall'area di rigore attacco, centro destra", "parata fuori dall'area di rigore attacco, centro destra", "tiro dall'area piccola attacco, centro sinistra", 'azione eseguita con una parte del corpo diversa attacco, centro sinistra', 'parata su tiro fuori area attacco, centro sinistra', 'azione offensiva attacco, centro sinistra', 'azione di contropiede attacco, centro sinistra', 'parata su tiro fuori area attacco, centro destra', 'tiro bloccato attacco, centro sinistra', 'azione offensiva attacco, centro destra', 'azione eseguita con i piedi attacco, centro sinistra', "tiro dall'area piccola attacco, centro destra", "parata nell'area di rigore attacco, centro sinistra", 'azione bloccata attacco, centro sinistra', 'azione di contropiede attacco, centro destra', "tiro fuori bersaglio dall'interno dell'area attacco, centrale"]]
+    prompt = f"""Sei un osservatore calcistico professionista con esperienza nell'analisi delle caratteristiche tecniche e tattiche dei giocatori.
+    Devi generare un rapporto dettagliato su un giocatore, basandoti sull'elenco delle azioni fornite che descrivono il suo stile di gioco durante le partite.
+    Il tuo compito è analizzare questi dati e fornire un rapporto strutturato come segue:
+    ###Input Data
+        - Giocatore: Rafael Leao 
+        - Azioni: ["tiro fuori bersaglio dall'interno dell'area attacco, centro sinistra", "tiro fuori bersaglio dall'interno dell'area attacco, centro destra", "tiro dall'area di rigore attacco, centro sinistra", "parata fuori dall'area di rigore attacco, centro sinistra", "tiro dall'area di rigore attacco, centro destra", "parata fuori dall'area di rigore attacco, centro destra", "tiro dall'area piccola attacco, centro sinistra", 'azione eseguita con una parte del corpo diversa attacco, centro sinistra', 'parata su tiro fuori area attacco, centro sinistra', 'azione offensiva attacco, centro sinistra', 'azione di contropiede attacco, centro sinistra', 'parata su tiro fuori area attacco, centro destra', 'tiro bloccato attacco, centro sinistra', 'azione offensiva attacco, centro destra', 'azione eseguita con i piedi attacco, centro sinistra', "tiro dall'area piccola attacco, centro destra", "parata nell'area di rigore attacco, centro sinistra", 'azione bloccata attacco, centro sinistra', 'azione di contropiede attacco, centro destra', "tiro fuori bersaglio dall'interno dell'area attacco, centrale"]
 
     Restituisci il report nel seguente formato:
-        Caratteristiche:
-        Punti di forza:
-        Debolezze:
-        Zone del campo predilette:
-    ###
+
+    ###Formato output
+        *
+        *Punti di forza*:
+        Evidenzia i punti di forza principali del giocatore emersi dal suo stile di gioco.
+        *Debolezze*:
+        Indica le aree in cui il giocatore deve migliorare.
+        *Zone del campo predilette*:
+        Identifica le zone del campo in cui il giocatore è più attivo o performa meglio.
+
+    ###Note per l'analisi
+        - Usa un linguaggio conciso e professionale.
+        - Il report deve essere realistico e utile per scopi di osservazione calcistica.
+        - Non generare codice o strutture di classe. Concentrati solo sull'analisi calcistica.
+        - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
+        - Non scrivere il nome del giocatore.
     """
     
     isTeam = False
@@ -225,7 +239,7 @@ if __name__ == '__main__':
         for p in players_dict.keys():
             pbar.update(1)
             p = "349207.0"
-            prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+            #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
             input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
             attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
 
