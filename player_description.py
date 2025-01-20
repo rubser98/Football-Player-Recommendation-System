@@ -101,13 +101,12 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
 
         ### Output Format:
         Your report should be structured in the following way:
-        1. **Characteristics**: 
-        Describe the player's technical and tactical characteristics based on the input data.
-        2. **Strengths**: 
+        **Player**: {player_name}
+        **Strengths**: 
         Highlight the player's key strengths evident from their playing style.
-        3. **Weaknesses**: 
+        **Weaknesses**: 
         Point out areas where the player needs improvement.
-        4. **Preferred areas of the field**: 
+        **Preferred areas of the field**: 
         Identify the areas on the field where the player is most active or performs best.
 
         ### Notes for Analysis:
@@ -115,7 +114,7 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         - The report should be realistic for scouting purposes.
         - Do not generate code or class structures. Focus only on the football analysis.
         - The output must be in plain text, clearly formatted according to the structure above.
-        - Do not repeat the name of the player
+        - Do not write the name of the player 
         
         Provide the report below this prompt, clearly labeled as "Generated Report".
 
