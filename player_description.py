@@ -113,9 +113,9 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         ### Notes for Analysis:
         - Use concise and professional language.
         - Base your analysis solely on the provided list of actions.
-        - The report should be realistic and actionable for scouting purposes.
-
-        Provide the output below this prompt, clearly labeled as "Generated Report". 
+        - The report should be realistic for scouting purposes.
+        - Do not generate code or class structures. Focus only on the football analysis.
+        - The output must be in plain text, clearly formatted according to the structure above.
 
         ### Generated Report:
         """
