@@ -232,7 +232,7 @@ if __name__ == '__main__':
                 outputs = model.generate(input_ids=input_ids,
                                         attention_mask=attention_mask, 
                                         max_new_tokens=2000, 
-                                        temperature=0.7,     # Modifica la temperatura qui
+                                        temperature=0.2,     # Modifica la temperatura qui
                                         top_k=50,            # Filtraggio top-k opzionale
                                         top_p=0.9,           # Nucleus sampling (top-p sampling) opzionale
                                         do_sample=True 
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                                         )
             
             #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###")[1]
+            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)#.split("###")[1]
 
             new_record = {}
             new_record['name'] = players_dict[p]
