@@ -88,6 +88,37 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
             Preferred areas of the field: 
         ###
         """
+
+        prompt = f""""
+        You are a professional football scout with expertise in analyzing players' technical and tactical characteristics. 
+        I need you to generate a detailed report for a player, based on the provided list of actions that describe their playing style during matches. 
+        Your task is to analyze this data and provide a structured report as follows:
+
+        ### Input Data:
+            - Player: {player_name}
+            - Actions: 
+            {vocab_results['documents'][0]}
+
+        ### Output Format:
+        Your report should be structured in the following way:
+        1. **Characteristics**: 
+        Describe the player's technical and tactical characteristics based on the input data.
+        2. **Strengths**: 
+        Highlight the player's key strengths evident from their playing style.
+        3. **Weaknesses**: 
+        Point out areas where the player needs improvement.
+        4. **Preferred areas of the field**: 
+        Identify the areas on the field where the player is most active or performs best.
+
+        ### Notes for Analysis:
+        - Use concise and professional language.
+        - Base your analysis solely on the provided list of actions.
+        - The report should be realistic and actionable for scouting purposes.
+
+        Provide the output below this prompt, clearly labeled as "Generated Report". 
+
+        ### Generated Report:
+        """
     else:
         raise KeyError('Linguaggio non supportato')
         
@@ -167,40 +198,7 @@ if __name__ == '__main__':
         team_prompt = prompt_team_description(team, '2021-2022', players_dict, player_season_collection, vocab_collection, player_season_counts)
     #print(team_prompt)
 
-    '''
 
-    prompt = f"""
-    Utilizzando i seguenti dati sulle azioni del giocatore, genera una descrizione schematica e dettagliata del suo stile di gioco. Organizza la risposta in tre sezioni principali:
-
-    1. **Punti di forza**: descrivi le aree in cui il giocatore eccelle, basandoti sui dati forniti.
-    2. **Debolezze**: individua i limiti o le difficoltà del giocatore, considerando le informazioni disponibili.
-    3. **Caratteristiche principali**: riassumi lo stile di gioco generale del giocatore, indicando ruolo, posizione preferita e peculiarità tecnico-tattiche.
-
-    ### Input dati del giocatore:
-
-    Nome giocatore: {player_name}
-    Top 5 documenti più simili all'embedding medio:
-  
-    {doc}
-
-    ### Formato di output richiesto:
-
-    #### Nome giocatore: {player_name}
-
-    1. **Punti di forza:**
-    - [Descrizione sintetica del primo punto di forza, es. precisione nei passaggi]
-    - [Descrizione sintetica del secondo punto di forza]
-
-    2. **Debolezze:**
-    - [Descrizione sintetica della prima debolezza, es. difficoltà nei contrasti]
-    - [Descrizione sintetica della seconda debolezza]
-
-    3. **Caratteristiche principali:**
-    - Ruolo e posizione preferita: [Es. "Centrocampista difensivo"]
-    - Stile di gioco: [Es. "Giocatore creativo, con visione di gioco e abilità nei passaggi lunghi"]
-    - Peculiarità tecniche: [Es. "Ambidestro, ottimo nei tiri da fuori area"]
-    """
-    '''
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
     
     #login()
@@ -233,8 +231,8 @@ if __name__ == '__main__':
                                         attention_mask=attention_mask, 
                                         max_new_tokens=2000, 
                                         temperature=0.2,     # Modifica la temperatura qui
-                                        top_k=50,            # Filtraggio top-k opzionale
-                                        top_p=0.9,           # Nucleus sampling (top-p sampling) opzionale
+                                        top_k=20,            # Filtraggio top-k opzionale
+                                        top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
                                         do_sample=True 
                                         #pad_token_id=tokenizer.eos_token_id
                                         )
