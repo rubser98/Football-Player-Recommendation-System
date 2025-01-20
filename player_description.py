@@ -183,7 +183,6 @@ if __name__ == '__main__':
     Devi generare un rapporto dettagliato su un giocatore, basandoti sull'elenco delle azioni fornite che descrivono il suo stile di gioco durante le partite.
     Il tuo compito è analizzare questi dati e fornire un rapporto strutturato come segue:
     ###Input Data
-        - Giocatore: Rafael Leao 
         - Azioni: ["tiro fuori bersaglio dall'interno dell'area attacco, centro sinistra", "tiro fuori bersaglio dall'interno dell'area attacco, centro destra", "tiro dall'area di rigore attacco, centro sinistra", "parata fuori dall'area di rigore attacco, centro sinistra", "tiro dall'area di rigore attacco, centro destra", "parata fuori dall'area di rigore attacco, centro destra", "tiro dall'area piccola attacco, centro sinistra", 'azione eseguita con una parte del corpo diversa attacco, centro sinistra', 'parata su tiro fuori area attacco, centro sinistra', 'azione offensiva attacco, centro sinistra', 'azione di contropiede attacco, centro sinistra', 'parata su tiro fuori area attacco, centro destra', 'tiro bloccato attacco, centro sinistra', 'azione offensiva attacco, centro destra', 'azione eseguita con i piedi attacco, centro sinistra', "tiro dall'area piccola attacco, centro destra", "parata nell'area di rigore attacco, centro sinistra", 'azione bloccata attacco, centro sinistra', 'azione di contropiede attacco, centro destra', "tiro fuori bersaglio dall'interno dell'area attacco, centrale"]
 
     Restituisci il report nel seguente formato:
