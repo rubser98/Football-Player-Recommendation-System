@@ -238,7 +238,7 @@ if __name__ == '__main__':
                                         )
             
             #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)#.split("###")[1]
+            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("### Generated Report:")[1]
 
             new_record = {}
             new_record['name'] = players_dict[p]
