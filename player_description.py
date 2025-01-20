@@ -116,7 +116,9 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         - The report should be realistic for scouting purposes.
         - Do not generate code or class structures. Focus only on the football analysis.
         - The output must be in plain text, clearly formatted according to the structure above.
-
+        
+        Provide the report below this prompt, clearly labeled as "Generated Report".
+        
         ### Generated Report:
         """
     else:
