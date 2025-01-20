@@ -203,6 +203,8 @@ if __name__ == '__main__':
         - Non generare codice o strutture di classe. Concentrati solo sull'analisi calcistica.
         - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
         - Non scrivere il nome del giocatore.
+
+    ###Report generato:
     """
     
     isTeam = False
@@ -255,7 +257,7 @@ if __name__ == '__main__':
                                         )
             
             #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("### Generated Report:")[1]
+            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
 
             new_record = {}
             new_record['name'] = players_dict[p]
