@@ -203,6 +203,7 @@ if __name__ == '__main__':
     
     #login()
     model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+    model_name = 'meta-llama/Llama-3.1-8B'
     #model_name = 'meta-llama/Llama-3.2-3B'
     #model_name = "galatolo/cerbero-7b"
     model = AutoModelForCausalLM.from_pretrained(
