@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
         for p in players_dict.keys():
             pbar.update(1)
-            p = 349207.0
+            p = "349207.0"
             prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
             input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
             attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
