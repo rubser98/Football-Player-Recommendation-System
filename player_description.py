@@ -190,7 +190,7 @@ if __name__ == '__main__':
         Zone del campo predilette:
     ###
     """
-    '''
+    
     isTeam = False
 
     if isTeam:
