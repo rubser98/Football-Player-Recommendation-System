@@ -189,7 +189,6 @@ if __name__ == '__main__':
     Restituisci il report nel seguente formato:
 
     ###Formato output
-        *Giocatore*: Rafael Leao
         *Caratteristiche*:
         Evidenzia le caratteristiche tecnico tattiche che meglio rappresentano il giocatore
         *Punti di forza*:
