@@ -26,6 +26,9 @@ if __name__ == '__main__':
     # Imposta il token di padding
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token 
+
+    if model.config.pad_token_id is None:
+        model.config.pad_token_id = tokenizer.eos_token_id
     
     with tqdm(total=len(prompt_dataset.keys()), desc="Processing players") as pbar:
 
@@ -39,7 +42,7 @@ if __name__ == '__main__':
                 outputs = model.generate(input_ids=input_ids,
                                         attention_mask=attention_mask, 
                                         max_new_tokens=2000, 
-                                        temperature=0.4,     # Modifica la temperatura qui
+                                        temperature=0.7,     # Modifica la temperatura qui
                                         top_k=20,            # Filtraggio top-k opzionale
                                         top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
                                         do_sample=True 
