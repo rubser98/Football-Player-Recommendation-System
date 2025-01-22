@@ -60,34 +60,39 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
 def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20, lang: str = 'en'):
 
     player_name = players_dict[p]
-    results = player_collection.get(where={'id': str(p)}, include=['embeddings'])['embeddings']
+    id = 'id' if lang == 'en' else 'playerId'
+    results = player_collection.get(where={id: str(p)}, include=['embeddings'])['embeddings']
     vocab_results = vocab_collection.query(query_embeddings=results, n_results = k, include=['documents'])
     if lang == 'it':
         prompt = f"""
-        Sei un osservatore in ambito calcistico. Ho bisogno che mi crei un report per {player_name} evidenziando caratteristiche tecniche e tattiche, punti di forza e debolezze.
-        Ecco una lista di azioni fatte durante le partite che meglio descrivono il giocatore: 
-            {vocab_results['documents']}
+        Sei un osservatore calcistico professionista con esperienza nell'analisi delle caratteristiche tecniche e tattiche dei giocatori.
+        Devi generare un rapporto dettagliato su un giocatore, basandoti sull'elenco delle azioni fornite che descrivono il suo stile di gioco durante le partite.
+        Il tuo compito è analizzare questi dati e fornire un rapporto strutturato come segue:
+        ###Input Data
+            - Azioni: {vocab_results['documents'][0]}
 
         Restituisci il report nel seguente formato:
 
-        Caratteristiche:
-        Punti di forza:
-        Debolezze:
-        Zone del campo predilette:
+        ###Formato output
+            *Caratteristiche*:
+            Evidenzia le caratteristiche tecnico tattiche che meglio rappresentano il giocatore
+            *Punti di forza*:
+            Evidenzia i punti di forza principali del giocatore emersi dal suo stile di gioco.
+            *Debolezze*:
+            Indica le aree in cui il giocatore deve migliorare.
+            *Zone del campo predilette*:
+            Identifica le zone del campo in cui il giocatore è più attivo o performa meglio.
 
+        ###Note per l'analisi
+            - Usa un linguaggio conciso e professionale.
+            - Il report deve essere realistico e utile per scopi di osservazione calcistica.
+            - Non generare codice o strutture di classe. Concentrati solo sull'analisi calcistica.
+            - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
+            - Non scrivere il nome del giocatore.
+
+        ###Report generato:
         """
     elif lang == 'en':
-        prompt = f"""
-        You are a football scout. I need you to create a report for player {player_name}, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
-        Here is a list of action describing the playing style performed during the matches:
-        {vocab_results['documents']}
-        Provide the report in the following format:
-            Characteristics:
-            Strengths:
-            Weaknesses:
-            Preferred areas of the field: 
-        ###
-        """
 
         prompt = f""""
         You are a professional football scout with expertise in analyzing players' technical and tactical characteristics. 
@@ -142,11 +147,16 @@ if __name__ == '__main__':
     vocab_name = "vocab" if args.lang == 'it' else "vocab_en"
     vocab_collection = client.get_collection(name=vocab_name)
     #"average_player_embeddings_version2"
-    player_collection = client.get_collection(name= f"average_player_embeddings_{args.lang}")
+    collection_name = "average_player_embeddings_version2" if args.lang == 'it' else "average_player_embeddings_en"
+    player_collection = client.get_collection(name= collection_name)
+    print(player_collection.metadata)
     #player_season_collection = client.get_collection(name=f"average_player_embeddings_season_{args.lang}")
-
-    #records = player_collection.get(limit=1)
-    #print(records['metadatas'])
+    collections = client.list_collections()
+    # Mostra i nomi delle collezioni
+    for collection in collections:
+        print(f"Collection Name: {collection.name}")
+    records = player_collection.get(limit=1)
+    print(records['metadatas'])
     #p = 349207.0 #Rafa Leao
     #p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
@@ -155,7 +165,7 @@ if __name__ == '__main__':
     #p=480249.0 #yamal
 
     dir = 'Dataset/Events2Text' if args.lang == 'it' else 'Dataset/Events2TextEN'
-    dir = 'Dataset'
+    #dir = 'Dataset'
     filename = 'player2vec_dataset.json' if args.lang == 'it' else 'player2vec_dataset_en.json'
     df_dataset = pd.read_json(f'{dir}/{filename}')
     player_season_counts = df_dataset.groupby(['playerId', 'playerName', 'season']).size().reset_index(name='row_count')
@@ -217,58 +227,62 @@ if __name__ == '__main__':
 
 
     #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
-    
+    generation = False
     #login()
-    model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
-    model_name = 'meta-llama/Llama-3.1-8B'
-    #model_name = 'meta-llama/Llama-3.2-3B'
-    #model_name = "galatolo/cerbero-7b"
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        device_map="auto", 
-        load_in_8bit=True, 
-        llm_int8_enable_fp32_cpu_offload=True,
-        offload_folder='offload_weights')
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    if generation:
+        #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
+        model_name = 'meta-llama/Llama-3.1-8B'
+        #model_name = 'meta-llama/Llama-3.2-3B'
+        #model_name = "galatolo/cerbero-7b"
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map="auto", 
+            load_in_8bit=True, 
+            llm_int8_enable_fp32_cpu_offload=True,
+            offload_folder='offload_weights')
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    # Imposta il token di padding
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token 
+        # Imposta il token di padding
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token 
     
     description_dataset = {}
     with tqdm(total=len(players_dict.keys()), desc="Processing players") as pbar:
 
         for p in players_dict.keys():
             pbar.update(1)
-            p = "349207.0"
-            #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
-            input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-            attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
+            #p = "349207.0"
+            #p="255777.0"
+            prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+            if generation:
+                input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
+                attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
 
-            with torch.no_grad():
-                outputs = model.generate(input_ids=input_ids,
-                                        attention_mask=attention_mask, 
-                                        max_new_tokens=2000, 
-                                        temperature=0.2,     # Modifica la temperatura qui
-                                        top_k=20,            # Filtraggio top-k opzionale
-                                        top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
-                                        do_sample=True 
-                                        #pad_token_id=tokenizer.eos_token_id
-                                        )
-            
-            #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-            generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
+                with torch.no_grad():
+                    outputs = model.generate(input_ids=input_ids,
+                                            attention_mask=attention_mask, 
+                                            max_new_tokens=2000, 
+                                            temperature=0.2,     # Modifica la temperatura qui
+                                            top_k=20,            # Filtraggio top-k opzionale
+                                            top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
+                                            do_sample=True 
+                                            #pad_token_id=tokenizer.eos_token_id
+                                            )
+                
+                #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
+                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
 
             new_record = {}
             new_record['name'] = players_dict[p]
             new_record['prompt'] = prompt
-            new_record['description'] = generated_text
+            #new_record['description'] = generated_text
             
             description_dataset[p] = new_record
-            print(description_dataset)
-            break
+            #print(description_dataset)
+            
+
     
-    utils.writeJson(description_dataset, f'{args.output_dir}/players_description.json')
+    utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}.json')
     #with open('prova_report_leao_qnt_it.txt', 'w') as f:
     #    f.write(generated_text)
 
