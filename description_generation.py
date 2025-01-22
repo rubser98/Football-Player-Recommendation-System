@@ -49,6 +49,7 @@ if __name__ == '__main__':
             generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
 
             prompt_dataset[p]['description'] = generated_text
+            break
     
     utils.writeJson(prompt_dataset, f'{args.dataset_dir}/player_description_{args.lang}_gen.json')
                 
