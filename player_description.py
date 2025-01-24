@@ -92,7 +92,6 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
 
         Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
         ###Report generato:
-        [INIZIO REPORT]
         """
     elif lang == 'en':
 
@@ -125,7 +124,6 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         
         Provide the report below this prompt, clearly labeled as "Generated Report".
         ###Generated Report:
-        [INIZIO REPORT]
         """
     else:
         raise KeyError('Linguaggio non supportato')
@@ -178,18 +176,7 @@ if __name__ == '__main__':
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
     
-    prompt= """
-    You are a football scout. I need you to create a report for player Rafael Leao, highlighting their technical and tactical characteristics, strengths, and weaknesses. 
-    Here is a list of action describing the playing style performed during the matches:
-    ["shot off target from inside the attacking area, left center", "shot off target from inside the attacking area, right center", "shot from the penalty area, left center", "save outside the penalty area, left center", "shot from the penalty area, right center", "save outside the penalty area, right center", "shot from the six-yard box, left center", "action performed with a body part other than the feet, left center", "save on a shot from outside the penalty area, left center", "offensive action, left center", "counterattack action, left center", "save on a shot from outside the penalty area, right center", "blocked shot, left center", "offensive action, right center", "action performed with the feet, left center", "shot from the six-yard box, right center", "save inside the penalty area, left center", "blocked action, left center", "counterattack action, right center", "shot off target from inside the attacking area, central"]]
-    Provide the report in the following format:
-        Characteristics:
-        Strengths:
-        Weaknesses:
-        Preferred areas of the field: 
     
-    ###
-    """
 
     prompt = f"""Sei un osservatore calcistico professionista con esperienza nell'analisi delle caratteristiche tecniche e tattiche dei giocatori.
     Devi generare un rapporto dettagliato su un giocatore, basandoti sull'elenco delle azioni fornite che descrivono il suo stile di gioco durante le partite.
