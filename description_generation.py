@@ -51,6 +51,7 @@ if __name__ == '__main__':
                                             top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
                                             do_sample=True, 
                                             #pad_token_id=tokenizer.eos_token_id
+                                            repetition_penalty=1.2,
                                             eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
                                             )
                 
