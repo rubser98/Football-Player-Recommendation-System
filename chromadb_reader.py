@@ -19,18 +19,24 @@ def getPlayersList(path: str) -> set:
 
 
 
-def getPlayersDict(path: str) -> dict:
+def getPlayersDict(path: str, season: str = None ) -> dict:
     players_list = {}
     #for file in os.listdir(path):
     for file in os.listdir(path):
         nazione = file.split('-')[0]
+        if season != None:
+            elab_file = season in file
+        else:
+            elab_file = True
         dict_file = utils.readJson(f'{path}/{file}')
-        for row in dict_file.values():
-            if nazione != 'Europa':
-                players_list = players_list | row['players']
+        if elab_file:
+            for row in dict_file.values():
+                if nazione != 'Europa':
+                    players_list = players_list | row['players']
             #players_list = players_list + players
     #players_list = [float(player) if '.' in player else int(player) for player in players_list]
-    players_list.pop('0.0')
+    if '0.0' in players_list.keys():
+        players_list.pop('0.0')
 
     return players_list
 

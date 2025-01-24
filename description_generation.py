@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     args = parser.parse_args()
 
-    prompt_dataset= utils.readJson(f'{args.dataset_dir}/players_description_{args.lang}.json')
+    prompt_dataset= utils.readJson(f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
 
     model_name = 'meta-llama/Llama-3.1-8B'
     model = AutoModelForCausalLM.from_pretrained(
@@ -45,12 +45,13 @@ if __name__ == '__main__':
                 with torch.no_grad():
                     outputs = model.generate(input_ids=input_ids,
                                             attention_mask=attention_mask, 
-                                            max_new_tokens=2000, 
-                                            temperature=0.7,     # Modifica la temperatura qui
+                                            max_new_tokens=800, 
+                                            temperature=0.4,     # Modifica la temperatura qui
                                             top_k=20,            # Filtraggio top-k opzionale
                                             top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
                                             do_sample=True 
                                             #pad_token_id=tokenizer.eos_token_id
+                                            eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
                                             )
                 
                 generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
@@ -63,10 +64,10 @@ if __name__ == '__main__':
 
             #ogni 10 descrizioni generate aggiorno il file target
             if count % 10 == 0:
-                utils.writeJson(prompt_dataset, f'{args.dataset_dir}/player_description_{args.lang}_gen.json')
+                utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
             
 
     
-    utils.writeJson(prompt_dataset, f'{args.dataset_dir}/player_description_{args.lang}_gen.json')
+    utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
                 
     

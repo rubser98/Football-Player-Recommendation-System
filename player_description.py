@@ -90,7 +90,9 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
             - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
             - Non scrivere il nome del giocatore.
 
+        Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
         ###Report generato:
+        [INIZIO REPORT]
         """
     elif lang == 'en':
 
@@ -122,8 +124,8 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         - Do not write the name of the player 
         
         Provide the report below this prompt, clearly labeled as "Generated Report".
-
-        ### Generated Report:
+        ###Generated Report:
+        [INIZIO REPORT]
         """
     else:
         raise KeyError('Linguaggio non supportato')
@@ -171,7 +173,7 @@ if __name__ == '__main__':
     player_season_counts = df_dataset.groupby(['playerId', 'playerName', 'season']).size().reset_index(name='row_count')
 
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
-    players_dict = getPlayersDict(args.dataset_dir)
+    players_dict = getPlayersDict(args.dataset_dir, '2023-2024')
 
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
@@ -282,7 +284,7 @@ if __name__ == '__main__':
             
 
     
-    utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}.json')
+    utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v2.json')
     #with open('prova_report_leao_qnt_it.txt', 'w') as f:
     #    f.write(generated_text)
 
