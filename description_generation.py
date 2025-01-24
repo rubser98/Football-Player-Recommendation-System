@@ -57,8 +57,8 @@ if __name__ == '__main__':
 
                 prompt_dataset[p]['description'] = generated_text
 
-                del input_ids, attention_mask, outputs
-                torch.cuda.empty_cache()
+                #del input_ids, attention_mask, outputs
+                #torch.cuda.empty_cache()
                 count+=1
 
             #ogni 10 descrizioni generate aggiorno il file target
