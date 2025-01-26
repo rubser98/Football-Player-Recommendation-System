@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     args = parser.parse_args()
 
-    prompt_dataset= utils.readJson(f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
+    prompt_dataset= utils.readJson(f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
 
     model_name = 'meta-llama/Llama-3.1-8B'
     model = AutoModelForCausalLM.from_pretrained(
@@ -65,10 +65,10 @@ if __name__ == '__main__':
 
             #ogni 10 descrizioni generate aggiorno il file target
             if count % 10 == 0:
-                utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
+                utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
             
 
     
-    utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v2.json')
+    utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
                 
     
