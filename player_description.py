@@ -69,11 +69,14 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         Devi generare un rapporto dettagliato su un giocatore, basandoti sull'elenco delle azioni fornite che descrivono il suo stile di gioco durante le partite.
         Il tuo compito è analizzare questi dati e fornire un rapporto strutturato come segue:
         ###Input Data
+            - Giocatore: {player_name}
             - Azioni: {vocab_results['documents'][0]}
 
         Restituisci il report nel seguente formato:
 
         ###Formato output
+            *Giocatore*:
+            {player_name}
             *Caratteristiche*:
             Evidenzia le caratteristiche tecnico tattiche che meglio rappresentano il giocatore
             *Punti di forza*:
@@ -146,8 +149,13 @@ if __name__ == '__main__':
     client = chromadb.PersistentClient(path=args.vector_store_dir)
     vocab_name = "vocab" if args.lang == 'it' else "vocab_en"
     vocab_collection = client.get_collection(name=vocab_name)
+    isTeam = True
+    season = '2023-2024'
     #"average_player_embeddings_version2"
-    collection_name = "average_player_embeddings_version2" if args.lang == 'it' else "average_player_embeddings_en"
+    if not isTeam:
+        collection_name = "average_player_embeddings_version2" if args.lang == 'it' else "average_player_embeddings_en"
+    else:
+        collection_name = "average_player_embeddings_season"
     player_collection = client.get_collection(name= collection_name)
     print(player_collection.metadata)
     #player_season_collection = client.get_collection(name=f"average_player_embeddings_season_{args.lang}")
@@ -171,7 +179,10 @@ if __name__ == '__main__':
     player_season_counts = df_dataset.groupby(['playerId', 'playerName', 'season']).size().reset_index(name='row_count')
 
     #players_path = 'Dataset/Events2Text/TeamPlayerList'
-    players_dict = getPlayersDict(args.dataset_dir, '2023-2024')
+
+    players_dict = getPlayersDict(args.dataset_dir, season) 
+    teams_dict = getTeamsPlayerDict(args.dataset_dir)[season]
+    
 
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
@@ -206,63 +217,29 @@ if __name__ == '__main__':
     ###Report generato:
     """
     
-    isTeam = False
-
-    if isTeam:
-        team_dict = getTeamsPlayerDict(args.dataset_dir)
-        team = team_dict['2021-2022']['80']['players']
-        team_prompt = prompt_team_description(team, '2021-2022', players_dict, player_season_collection, vocab_collection, player_season_counts)
-    #print(team_prompt)
+    iteration_dict = teams_dict if isTeam else players_dict
 
 
-    #model_name='rstless-research/DanteLLM-7B-Instruct-Italian-v0.1'
-    generation = False
-    #login()
-    if generation:
-        #model_name = 'meta-llama/Meta-Llama-3.1-8B-Instruct'
-        model_name = 'meta-llama/Llama-3.1-8B'
-        #model_name = 'meta-llama/Llama-3.2-3B'
-        #model_name = "galatolo/cerbero-7b"
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map="auto", 
-            load_in_8bit=True, 
-            llm_int8_enable_fp32_cpu_offload=True,
-            offload_folder='offload_weights')
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-        # Imposta il token di padding
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token 
-    
     description_dataset = {}
-    with tqdm(total=len(players_dict.keys()), desc="Processing players") as pbar:
+    with tqdm(total=len(iteration_dict.keys()), desc="Processing players") as pbar:
 
-        for p in players_dict.keys():
+        for p in iteration_dict.keys():
             pbar.update(1)
             #p = "349207.0"
             #p="255777.0"
-            prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
-            if generation:
-                input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-                attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
-
-                with torch.no_grad():
-                    outputs = model.generate(input_ids=input_ids,
-                                            attention_mask=attention_mask, 
-                                            max_new_tokens=2000, 
-                                            temperature=0.2,     # Modifica la temperatura qui
-                                            top_k=20,            # Filtraggio top-k opzionale
-                                            top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
-                                            do_sample=True 
-                                            #pad_token_id=tokenizer.eos_token_id
-                                            )
-                
-                #print(tokenizer.batch_decode(outputs, skip_special_tokens=True)[0].split("[/INST]")[1])
-                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
 
             new_record = {}
-            new_record['name'] = players_dict[p]
+
+            if not isTeam:
+                prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+                new_record['name'] = players_dict[p] 
+            else:
+                team = iteration_dict[p]['players']
+                prompt = prompt_team_description(team, season, players_dict, player_collection, vocab_collection, player_season_counts,lang=args.lang)
+                new_record['name'] = iteration_dict[p]['name'] 
+
+            
+            
             new_record['prompt'] = prompt
             #new_record['description'] = generated_text
             
@@ -270,8 +247,11 @@ if __name__ == '__main__':
             #print(description_dataset)
             
 
-    
-    utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v2.json')
+    if not isTeam:
+        utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v3.json')
+    else:
+        utils.writeJson(description_dataset, f'{args.output_dir}/team_description_{args.lang}.json')
+
     #with open('prova_report_leao_qnt_it.txt', 'w') as f:
     #    f.write(generated_text)
 
