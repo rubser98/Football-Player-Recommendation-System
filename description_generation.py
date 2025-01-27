@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
             #effettuo operazioni solo se non ho già generato descrizione per il giocatore nel caso di run multiple
             if 'description' not in prompt_dataset[p].keys():
-                prompt = prompt_dataset[p]['prompt'] + "\n ###Report generato:"
+                prompt = prompt_dataset[p]['prompt']
                 input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
                 attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
 
