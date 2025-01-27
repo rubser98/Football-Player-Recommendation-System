@@ -53,7 +53,28 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
             f_string = f'- {player_name}: presenze: {presenze}, caratteristiche: {actions}\n'
             prompt_team += f_string
         except:
-            print(player_name)
+            continue
+    
+    prompt_team += """
+    ###Formato output
+            *Caratteristiche*:
+            Evidenzia le caratteristiche tecnico tattiche che meglio rappresentano la squadra
+            *Punti di forza*:
+            Evidenzia i punti di forza principali della squadra emersi dal suo stile di gioco.
+            *Debolezze*:
+            Indica le aree in cui la squadra deve migliorare.
+            *Zone del campo predilette*:
+            Identifica le zone del campo in cui la squadra è più attiva o performa meglio.
+    ###Note per l'analisi
+            - Usa un linguaggio conciso e professionale.
+            - Il report deve essere realistico e utile per scopi di osservazione calcistica.
+            - Non generare codice o strutture di classe. Concentrati solo sull'analisi calcistica.
+            - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
+            - Non scrivere il nome del giocatore.
+
+        Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
+        ###Report generato:
+    """
 
     return prompt_team
 
@@ -156,15 +177,12 @@ if __name__ == '__main__':
         collection_name = "average_player_embeddings_version2" if args.lang == 'it' else "average_player_embeddings_en"
     else:
         collection_name = "average_player_embeddings_season"
+
     player_collection = client.get_collection(name= collection_name)
-    print(player_collection.metadata)
     #player_season_collection = client.get_collection(name=f"average_player_embeddings_season_{args.lang}")
-    collections = client.list_collections()
-    # Mostra i nomi delle collezioni
-    for collection in collections:
-        print(f"Collection Name: {collection.name}")
-    records = player_collection.get(limit=1)
-    print(records['metadatas'])
+
+    #records = player_collection.get(limit=1)
+    #print(records['metadatas'])
     #p = 349207.0 #Rafa Leao
     #p = 303115.0 #Theo
     #p = 300713.0 #Mbappe
@@ -235,7 +253,7 @@ if __name__ == '__main__':
                 new_record['name'] = players_dict[p] 
             else:
                 team = iteration_dict[p]['players']
-                prompt = prompt_team_description(team, season, players_dict, player_collection, vocab_collection, player_season_counts,lang=args.lang)
+                prompt = prompt_team_description(team, season, players_dict, player_collection, vocab_collection, player_season_counts,lang=args.lang, k=5)
                 new_record['name'] = iteration_dict[p]['name'] 
 
             
@@ -244,6 +262,7 @@ if __name__ == '__main__':
             #new_record['description'] = generated_text
             
             description_dataset[p] = new_record
+            break
             #print(description_dataset)
             
 
