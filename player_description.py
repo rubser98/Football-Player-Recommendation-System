@@ -262,7 +262,7 @@ if __name__ == '__main__':
             #new_record['description'] = generated_text
             
             description_dataset[p] = new_record
-            break
+
             #print(description_dataset)
             
 

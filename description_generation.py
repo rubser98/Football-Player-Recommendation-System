@@ -68,8 +68,7 @@ if __name__ == '__main__':
                 #del input_ids, attention_mask, outputs
                 #torch.cuda.empty_cache()
                 count+=1
-                print(generated_text)
-                break
+
 
             #ogni 10 descrizioni generate aggiorno il file target
             if count % 10 == 0:
