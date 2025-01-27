@@ -9,9 +9,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
+    parser.add_argument("--is_player", type=int, required=False, default=1, help="Choose if run generation for players or teams.")
     args = parser.parse_args()
 
-    prompt_dataset= utils.readJson(f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
+    if args.is_player:
+        filename = f'{args.dataset_dir}/players_description_{args.lang}_v3.json'  
+    else: 
+        filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
+
+    prompt_dataset= utils.readJson(filename)
 
     model_name = 'meta-llama/Llama-3.1-8B'
     model = AutoModelForCausalLM.from_pretrained(
@@ -62,13 +68,15 @@ if __name__ == '__main__':
                 #del input_ids, attention_mask, outputs
                 #torch.cuda.empty_cache()
                 count+=1
+                print(generated_text)
+                break
 
             #ogni 10 descrizioni generate aggiorno il file target
             if count % 10 == 0:
-                utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
+                utils.writeJson(prompt_dataset, filename)
             
 
     
-    utils.writeJson(prompt_dataset, f'{args.dataset_dir}/players_description_{args.lang}_v3.json')
+    utils.writeJson(prompt_dataset, filename)
                 
     
