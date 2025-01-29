@@ -30,10 +30,8 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
     
     if lang == 'it':
         prompt_team = """Sei un football match analyst esperto. 
-        Ho bisogno che mi crei un report per una squadra di calcio basandoti sulle azioni compiute dai giocatori che la compongono. 
-        Utilizza queste informazioni per analizzare le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
-        Per ogni giocatore è indicato il numero di presenze. Più è alto il numero delle presenze e maggiore sarà il suo contributo nello stile di gioco della squadra.
-        Nel report non specificare nomi dei giocatori.
+        Devi creare un report su una squadra di calcio basandoti esclusivamente sulle azioni compiute dai suoi giocatori. Analizza le caratteristiche tecniche e tattiche collettive della squadra, evidenziando lo stile di gioco, i punti di forza, le debolezze e le zone del campo maggiormente sfruttate.
+        Ogni giocatore ha un numero di presenze indicato. Maggiore è il numero di presenze, maggiore sarà il suo impatto sullo stile di gioco della squadra.
         La lista delle azioni per ciascun giocatore è fornita qui sotto:
         """
     elif lang == 'en':
@@ -70,9 +68,12 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
             - Il report deve essere realistico e utile per scopi di osservazione calcistica.
             - Non generare codice o strutture di classe. Concentrati solo sull'analisi calcistica.
             - L'output deve essere in testo semplice, chiaramente formattato secondo la struttura sopra indicata.
-            - Non scrivere il nome del giocatore.
+            - Non scrivere i nomi dei giocatori.
+            - Genera il report esclusivamente basandoti sui dati forniti in input.
+            - Evita considerazioni relative a fattori esterni come ad esempio l'arbitro.
+            - Evita considerazioni sui giocatori (esempio. "I giocatori sono i più forti della storia")
 
-        Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
+        Genera solo il contenuto del report. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
         ###Report generato:
     """
 

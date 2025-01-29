@@ -55,7 +55,7 @@ if __name__ == '__main__':
                                             temperature=0.7,     # Modifica la temperatura qui
                                             top_k=20,            # Filtraggio top-k opzionale
                                             top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
-                                            do_sample=True, 
+                                            do_sample=False, 
                                             #pad_token_id=tokenizer.eos_token_id
                                             repetition_penalty=1.2
                                             #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
