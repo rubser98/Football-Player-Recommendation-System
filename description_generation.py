@@ -62,7 +62,7 @@ if __name__ == '__main__':
                                             #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
                                             )
                 
-                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report generato:")[1]
+                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Report Generato:")[1]
 
                 prompt_dataset[p]['description'] = generated_text
 
