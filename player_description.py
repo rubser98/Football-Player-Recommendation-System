@@ -116,8 +116,6 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
             - Non scrivere il nome del giocatore.
 
         Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
-        Ecco alcuni esempi di report in base all'input:
-
         """
     elif lang == 'en':
 
@@ -155,13 +153,14 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         raise KeyError('Linguaggio non supportato')
     
     if few_shot_samples != None:
+        prompt+="Ecco alcuni esempi di report in base all'input:\n"
         for sample in few_shot_samples:
             inp_s = sample['input']
             out_s = sample['output']
-            input_string = f"input: Giocatore: {inp_s['giocatore']}\n Azioni: {inp_s['azioni']} \n"
-            output_string = f'output: {out_s}\n'
+            input_string = f"###Input\n Giocatore: {inp_s['giocatore']}\n Azioni: {inp_s['azioni']} \n"
+            output_string = f'###Output\n {out_s}\n'
             prompt= prompt + input_string + output_string
-            
+
     prompt+="###Report Generato:"
     return prompt
 
@@ -212,7 +211,7 @@ if __name__ == '__main__':
     players_dict = getPlayersDict(args.dataset_dir, season) 
     teams_dict = getTeamsPlayerDict(args.dataset_dir)[season]
     
-    few_shot_samples = utils.readJson(f'{args.output_dir}/few_shot_samples.json')
+    few_shot_samples = utils.readJson(f'{args.output_dir}/few_shot_samples.json')[:1]
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
     
@@ -261,7 +260,7 @@ if __name__ == '__main__':
             new_record = {}
 
             if not isTeam:
-                prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
+                prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang, few_shot_samples=few_shot_samples)
                 new_record['name'] = players_dict[p] 
             else:
                 team = iteration_dict[p]['players']
@@ -279,7 +278,7 @@ if __name__ == '__main__':
             
 
     if not isTeam:
-        utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v4.json')
+        utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v5.json')
     else:
         utils.writeJson(description_dataset, f'{args.output_dir}/team_description_{args.lang}.json')
 
