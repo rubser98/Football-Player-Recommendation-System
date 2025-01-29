@@ -12,8 +12,9 @@ if __name__ == '__main__':
     parser.add_argument("--is_player", type=int, required=False, default=1, help="Choose if run generation for players or teams.")
     args = parser.parse_args()
 
+    #vediamo con few shot prompting distillation
     if args.is_player:
-        filename = f'{args.dataset_dir}/players_description_{args.lang}_v3.json'  
+        filename = f'{args.dataset_dir}/players_description_{args.lang}_v4.json' 
     else: 
         filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
 

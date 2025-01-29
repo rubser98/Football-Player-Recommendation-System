@@ -79,7 +79,7 @@ def prompt_team_description(team : dict, season:str, players_dict : dict, player
 
     return prompt_team
 
-def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20, lang: str = 'en'):
+def prompt_player_description(p: str, players_dict: dict, player_collection: chromadb.Collection, vocab_collection: chromadb.Collection, k: int = 20, lang: str = 'en', few_shot_samples: list = None):
 
     player_name = players_dict[p]
     id = 'id' if lang == 'en' else 'playerId'
@@ -116,7 +116,8 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
             - Non scrivere il nome del giocatore.
 
         Genera solo il contenuto del rapporto. Non includere spiegazioni, istruzioni, o altre informazioni oltre a quelle richieste.
-        ###Report generato:
+        Ecco alcuni esempi di report in base all'input:
+
         """
     elif lang == 'en':
 
@@ -152,7 +153,16 @@ def prompt_player_description(p: str, players_dict: dict, player_collection: chr
         """
     else:
         raise KeyError('Linguaggio non supportato')
-        
+    
+    if few_shot_samples != None:
+        for sample in few_shot_samples:
+            inp_s = sample['input']
+            out_s = sample['output']
+            input_string = f"input: Giocatore: {inp_s['giocatore']}\n Azioni: {inp_s['azioni']} \n"
+            output_string = f'output: {out_s}\n'
+            prompt= prompt + input_string + output_string
+            
+    prompt+="###Report Generato:"
     return prompt
 
 def getAppearances(df_dataset: pd.DataFrame, p: str, season: str) -> int:
@@ -171,7 +181,7 @@ if __name__ == '__main__':
     client = chromadb.PersistentClient(path=args.vector_store_dir)
     vocab_name = "vocab" if args.lang == 'it' else "vocab_en"
     vocab_collection = client.get_collection(name=vocab_name)
-    isTeam = True
+    isTeam = False
     season = '2023-2024'
     #"average_player_embeddings_version2"
     if not isTeam:
@@ -202,7 +212,7 @@ if __name__ == '__main__':
     players_dict = getPlayersDict(args.dataset_dir, season) 
     teams_dict = getTeamsPlayerDict(args.dataset_dir)[season]
     
-
+    few_shot_samples = utils.readJson(f'{args.output_dir}/few_shot_samples.json')
     #prompt = prompt_player_description(str(p), players_dict, player_collection, vocab_collection, lang = args.lang)
     #print(prompt)
     
@@ -235,7 +245,8 @@ if __name__ == '__main__':
 
     ###Report generato:
     """
-    
+    #players_dict = {"3281.0":"Zlatan Ibrahimovic", "44721.0": "Sergio Busquets", "12712.0": "Gerard Piqué", "79554.0": "David De Gea"}
+
     iteration_dict = teams_dict if isTeam else players_dict
 
 
@@ -268,7 +279,7 @@ if __name__ == '__main__':
             
 
     if not isTeam:
-        utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v3.json')
+        utils.writeJson(description_dataset, f'{args.output_dir}/players_description_{args.lang}_v4.json')
     else:
         utils.writeJson(description_dataset, f'{args.output_dir}/team_description_{args.lang}.json')
 
