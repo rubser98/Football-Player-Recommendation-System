@@ -15,7 +15,7 @@ if __name__ == '__main__':
     #vediamo con few shot prompting distillation
     if args.is_player:
         #filename = f'{args.dataset_dir}/players_description_{args.lang}_v4_post.json'
-        filename = f'{args.dataset_dir}/prova_stats.json'
+        filename = f'{args.dataset_dir}/prova_stats_v2.json'
 
     else: 
         filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
@@ -47,29 +47,31 @@ if __name__ == '__main__':
 
             #effettuo operazioni solo se non ho già generato descrizione per il giocatore nel caso di run multiple
             if 'description' not in prompt_dataset[p].keys():
-                prompt = prompt_dataset[p]['prompt']
-                input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-                attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
+                prompt_dataset[p]['description'] = []
+                prompts = prompt_dataset[p]['prompt']
+                for prompt in prompts:
+                    input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
+                    attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
 
-                with torch.no_grad():
-                    outputs = model.generate(input_ids=input_ids,
-                                            attention_mask=attention_mask, 
-                                            max_new_tokens=500, 
-                                            temperature=0.2,     # Modifica la temperatura qui
-                                            top_k=20,            # Filtraggio top-k opzionale
-                                            top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
-                                            do_sample=True, 
-                                            #pad_token_id=tokenizer.eos_token_id
-                                            repetition_penalty=1.2
-                                            #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
-                                            )
-                
-                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
+                    with torch.no_grad():
+                        outputs = model.generate(input_ids=input_ids,
+                                                attention_mask=attention_mask, 
+                                                max_new_tokens=500, 
+                                                temperature=0.2,     # Modifica la temperatura qui
+                                                top_k=20,            # Filtraggio top-k opzionale
+                                                top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
+                                                do_sample=True, 
+                                                #pad_token_id=tokenizer.eos_token_id
+                                                repetition_penalty=1.2
+                                                #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
+                                                )
+                    
+                    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
 
-                prompt_dataset[p]['description'] = generated_text
+                    prompt_dataset[p]['description'].append(generated_text)
 
-                #del input_ids, attention_mask, outputs
-                #torch.cuda.empty_cache()
+                    #del input_ids, attention_mask, outputs
+                    #torch.cuda.empty_cache()
                 count+=1
 
 
