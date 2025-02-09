@@ -132,28 +132,32 @@ def mainRose(competitions, seasons):
     driver.quit()
 
 
-    if __name__ == '__main__':
-        out_path = 'Dataset\Transfermarkt\Transfers'
-        file_path = 'Dataset//Transfermarkt//transfers_urls.json'
-        driver = initializeDriver()
-        with open(file_path, 'r') as file:
-            competitions = json.load(file)
-        season = ['2019','2020','2021','2022','2023']
-        #season = ['2023']
-        for league, url in competitions.items():
-            if league in ['eredivisie']:
-                for s in season:
-                    url_n = url + f'/plus/?saison_id={s}&s_w=&leihe=3&intern=0'
-                    print(url_n) 
-                    driver.get(url_n)
-                    boxes = driver.find_elements(By.CLASS_NAME, 'box')[3:-1]
-                    list_transfers = []
-                    for x in boxes:
-                        team_name = x.find_element(By.CLASS_NAME, 'content-box-headline').text
-                        transfers = x.find_elements(By.CLASS_NAME, 'responsive-table')
-                        acquisti = transfers[0]
-                        cessioni = transfers[1]
-                        listaTrasferimenti(acquisti, True, list_transfers, team_name)
-                        listaTrasferimenti(cessioni,False, list_transfers, team_name)
-                    writeJson(list_transfers, os.path.join(out_path, f'{league}_{s}.json'))
-        driver.quit()
+if __name__ == '__main__':
+    out_path = 'Dataset\Transfermarkt\Transfers'
+    file_path = 'Dataset//Transfermarkt//transfers_urls.json'
+    driver = initializeDriver()
+    with open(file_path, 'r') as file:
+        competitions = json.load(file)
+    season = ['2019','2020','2021','2022','2023']
+    season = ['2024']
+    print(season)
+    for league, url in competitions.items():
+        
+            for s in season:
+                url_n = url + f'/plus/?saison_id={s}&s_w=&leihe=3&intern=0'
+                print(url_n) 
+                driver.get(url_n)
+                boxes = driver.find_elements(By.CLASS_NAME, 'box')[3:-1]
+                list_transfers = []
+                for x in boxes:
+                    team_name = x.find_element(By.CLASS_NAME, 'content-box-headline').text
+                    print(team_name)
+                    if team_name == 'BILANCIO TRASFERIMENTI':
+                        break
+                    transfers = x.find_elements(By.CLASS_NAME, 'responsive-table')
+                    acquisti = transfers[0]
+                    cessioni = transfers[1]
+                    listaTrasferimenti(acquisti, True, list_transfers, team_name)
+                    listaTrasferimenti(cessioni,False, list_transfers, team_name)
+                writeJson(list_transfers, os.path.join(out_path, f'{league}_{s}.json'))
+    driver.quit()
