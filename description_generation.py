@@ -49,7 +49,8 @@ if __name__ == '__main__':
             if 'description' not in prompt_dataset[p].keys():
                 prompt_dataset[p]['description'] = []
                 prompts = prompt_dataset[p]['prompt']
-                for prompt in prompts:
+                prompt_dataset[p]['description'] = {}
+                for k, prompt in prompts.items():
                     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
                     attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
 
@@ -68,7 +69,7 @@ if __name__ == '__main__':
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
 
-                    prompt_dataset[p]['description'].append(generated_text)
+                    prompt_dataset[p]['description'][k] = generated_text
 
                     #del input_ids, attention_mask, outputs
                     #torch.cuda.empty_cache()
