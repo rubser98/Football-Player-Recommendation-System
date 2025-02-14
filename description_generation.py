@@ -27,8 +27,8 @@ if __name__ == '__main__':
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto", 
-            #load_in_8bit=True, 
-            #llm_int8_enable_fp32_cpu_offload=True,
+            load_in_8bit=True, 
+            llm_int8_enable_fp32_cpu_offload=True,
             offload_folder='offload_weights')
     
     tokenizer = AutoTokenizer.from_pretrained(model_name)
