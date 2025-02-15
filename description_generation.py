@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     #model_name = 'meta-llama/Llama-3.1-8B'
     #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B'
-    model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B'
+    model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     #model_name = 'meta-llama/Llama-3.1-70B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
