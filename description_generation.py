@@ -29,7 +29,7 @@ if __name__ == '__main__':
     #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="auto",
+            device_map=None,
             load_in_8bit=True, 
             llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
             offload_folder='offload_weights'  # Solo se è su CPU
