@@ -31,8 +31,8 @@ if __name__ == '__main__':
             model_name,
             device_map=None,
             load_in_8bit=True, 
-            llm_int8_enable_fp32_cpu_offload=True if not use_gpu else None,  # Solo se è su CPU
-            offload_folder='offload_weights' if not use_gpu else None  # Solo se è su CPU
+            llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
+            offload_folder='offload_weights'  # Solo se è su CPU
             )
     
     tokenizer = AutoTokenizer.from_pretrained(model_name)
