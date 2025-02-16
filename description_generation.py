@@ -33,7 +33,7 @@ if __name__ == '__main__':
             load_in_8bit=True, 
             llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
             offload_folder='offload_weights'  # Solo se è su CPU
-            ).to(device)
+            )
     
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
