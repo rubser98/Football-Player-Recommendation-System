@@ -29,7 +29,7 @@ if __name__ == '__main__':
     #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map=None,
+            device_map="auto",
             load_in_8bit=True, 
             llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
             offload_folder='offload_weights'  # Solo se è su CPU
@@ -70,6 +70,8 @@ if __name__ == '__main__':
                                                 #pad_token_id=tokenizer.eos_token_id
                                                 repetition_penalty=1.2
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
+                                                ,num_beams=1
+                                                ,use_cache=True
                                                 )
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
