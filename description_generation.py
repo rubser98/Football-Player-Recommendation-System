@@ -22,16 +22,18 @@ if __name__ == '__main__':
 
     prompt_dataset= utils.readJson(filename)
 
-    #model_name = 'meta-llama/Llama-3.1-8B'
-    #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B'
-    model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
-    #model_name = 'meta-llama/Llama-3.1-70B'
+    #use_gpu = torch.cuda.is_available()  # Verifica se c'è una GPU disponibile
+    use_gpu = False
+    device = torch.device("cuda" if use_gpu else "cpu")
+    model_name = 'meta-llama/Llama-3.1-8B'
+    #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="auto", 
+            device_map="auto" if use_gpu else None,
             load_in_8bit=True, 
-            llm_int8_enable_fp32_cpu_offload=True,
-            offload_folder='offload_weights')
+            llm_int8_enable_fp32_cpu_offload=True if not use_gpu else None,  # Solo se è su CPU
+            offload_folder='offload_weights' if not use_gpu else None  # Solo se è su CPU
+            )
     
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -54,8 +56,8 @@ if __name__ == '__main__':
                 prompts = prompt_dataset[p]['prompt']
                 prompt_dataset[p]['description'] = {}
                 for k, prompt in prompts.items():
-                    input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.cuda()
-                    attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.cuda()
+                    input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.to(device)
+                    attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
 
                     with torch.no_grad():
                         outputs = model.generate(input_ids=input_ids,
