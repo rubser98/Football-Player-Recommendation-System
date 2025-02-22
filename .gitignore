@@ -6,3 +6,4 @@ offload_weights
 __pycache__
 Descriptions
 checkpoints
+dataset_exploration*
