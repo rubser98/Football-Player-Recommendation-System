@@ -70,8 +70,7 @@ if __name__ == '__main__':
                                                 #pad_token_id=tokenizer.eos_token_id
                                                 repetition_penalty=1.2
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
-                                                ,num_beams=1
-                                                ,use_cache=True
+
                                                 )
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
