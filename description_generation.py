@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
                                                 )
                     
-                    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
+                    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)#.split("###Generated Report:")[1]
 
                     prompt_dataset[p]['description'][k] = generated_text
 
