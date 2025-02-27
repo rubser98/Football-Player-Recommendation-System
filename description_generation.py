@@ -25,8 +25,8 @@ if __name__ == '__main__':
     #use_gpu = torch.cuda.is_available()  # Verifica se c'è una GPU disponibile
     use_gpu = True
     device = torch.device("cuda" if use_gpu else "cpu")
-    model_name = 'meta-llama/Llama-3.1-8B'
-    #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
+    #model_name = 'meta-llama/Llama-3.1-8B'
+    model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
