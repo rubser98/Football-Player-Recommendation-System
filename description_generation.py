@@ -69,16 +69,38 @@ if __name__ == '__main__':
                                                 do_sample=True, 
                                                 #pad_token_id=tokenizer.eos_token_id
                                                 repetition_penalty=1.2
+                                                ,pad_token_id=tokenizer.eos_token_id
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
 
                                                 )
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
-
                     prompt_dataset[p]['description'][k] = generated_text
 
-                    #del input_ids, attention_mask, outputs
-                    #torch.cuda.empty_cache()
+                summary_prompt = "Give me a very concise summary of the following report:"
+                for k, desc in prompt_dataset[p]['description'].items():
+                    summary_prompt += f'{k}: {desc}\n'
+                summary_prompt+= "###Generated Report:"
+
+                input_ids = tokenizer(summary_prompt, return_tensors="pt", truncation=True).input_ids.to(device)
+                attention_mask = tokenizer(summary_prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
+
+                with torch.no_grad():
+                        outputs = model.generate(input_ids=input_ids,
+                                                attention_mask=attention_mask, 
+                                                max_new_tokens=300, 
+                                                temperature=1,     # Modifica la temperatura qui
+                                                top_k=20,            # Filtraggio top-k opzionale
+                                                top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
+                                                do_sample=True, 
+                                                #pad_token_id=tokenizer.eos_token_id
+                                                repetition_penalty=1.2
+                                                ,pad_token_id=tokenizer.eos_token_id
+                                                #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
+                                                )
+                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
+                prompt_dataset[p]['description']['summary'] = generated_text
+
                 count+=1
 
 
