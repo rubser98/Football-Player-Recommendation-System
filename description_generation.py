@@ -28,6 +28,7 @@ if __name__ == '__main__':
     #model_name = 'meta-llama/Llama-3.1-8B'
     #model_name = 'meta-llama/Llama-3.2-3B'
     model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
+    model_name = 'Qwen/Qwen2.5-7B-Instruct'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
