@@ -79,6 +79,7 @@ if __name__ == '__main__':
 
                 summary_prompt = "Give me a very concise summary of the following report:"
                 for k, desc in prompt_dataset[p]['description'].items():
+                    print(p,k)
                     summary_prompt += f'{k}: {desc}\n'
                 summary_prompt+= "###Generated Report:"
 
@@ -86,7 +87,7 @@ if __name__ == '__main__':
                 attention_mask = tokenizer(summary_prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
 
                 with torch.no_grad():
-                        outputs = model.generate(input_ids=input_ids,
+                        summary_outputs = model.generate(input_ids=input_ids,
                                                 attention_mask=attention_mask, 
                                                 max_new_tokens=300, 
                                                 temperature=1,     # Modifica la temperatura qui
@@ -98,8 +99,8 @@ if __name__ == '__main__':
                                                 ,pad_token_id=tokenizer.eos_token_id
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
                                                 )
-                generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
-                prompt_dataset[p]['description']['summary'] = generated_text
+                summary_text = tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
+                prompt_dataset[p]['description']['summary'] = summary_text
 
                 count+=1
 
