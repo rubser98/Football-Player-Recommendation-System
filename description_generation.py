@@ -76,7 +76,7 @@ if __name__ == '__main__':
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                     prompt_dataset[p]['description'][k] = generated_text
-                    
+
                 print(p, prompt_dataset[p]['description'].keys())
                 summary_prompt = "Give me a very concise summary of the following report:"
                 for k, desc in prompt_dataset[p]['description'].items():
@@ -100,6 +100,7 @@ if __name__ == '__main__':
                                                 ,pad_token_id=tokenizer.eos_token_id
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
                                                 )
+                print(len(tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")))
                 summary_text = tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                 prompt_dataset[p]['description']['summary'] = summary_text
                 print(p, prompt_dataset[p]['description'].keys())
