@@ -82,7 +82,7 @@ if __name__ == '__main__':
                 print(p, prompt_dataset[p]['description'].keys())
                 summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
                 ##Task
-                Generate a concise and coherent summary (100 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
+                Generate a concise and coherent summary (150 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
                 {list(prompt_dataset[p]['description'].keys())}
                 ##Instructions
                 Synthesize the provided descriptions into a unified scouting report.
