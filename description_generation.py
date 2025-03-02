@@ -92,8 +92,10 @@ if __name__ == '__main__':
                 Ensure the summary is cohesive, presenting the player as a complete profile rather than a segmented analysis.
                 Use [END_REPORT] when you end the description
                 Avoid consideration about the generated report in conclusions
-                
+                The report must focus on charateristics related to the position (e.g defender should focus on defensive skills)
+
                 ##Input
+                Position: {prompt_dataset[p]['position']}
                 """
                 for k, desc in prompt_dataset[p]['description'].items():
                     summary_prompt += f'{k}: {desc}\n'
