@@ -25,8 +25,8 @@ if __name__ == '__main__':
     #use_gpu = torch.cuda.is_available()  # Verifica se c'è una GPU disponibile
     use_gpu = True
     device = torch.device("cuda" if use_gpu else "cpu")
-    #model_name = 'meta-llama/Llama-3.1-8B'
-    model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
+    model_name = 'meta-llama/Llama-3.1-8B'
+    #model_name = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-14B'
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
@@ -52,9 +52,9 @@ if __name__ == '__main__':
 
             #effettuo operazioni solo se non ho già generato descrizione per il giocatore nel caso di run multiple
             if 'description' not in prompt_dataset[p].keys():
-                prompt_dataset[p]['description'] = []
                 prompts = prompt_dataset[p]['prompt']
                 prompt_dataset[p]['description'] = {}
+
                 for k, prompt in prompts.items():
                     input_ids = tokenizer(prompt, return_tensors="pt", truncation=True).input_ids.to(device)
                     attention_mask = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
