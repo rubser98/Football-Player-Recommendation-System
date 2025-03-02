@@ -80,7 +80,18 @@ if __name__ == '__main__':
                     prompt_dataset[p]['description'][k] = generated_text
 
                 print(p, prompt_dataset[p]['description'].keys())
-                summary_prompt = "Give me a very concise summary of the following report:"
+                summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
+                ##Task
+                Generate a concise and coherent summary (100 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
+                {list(prompt_dataset[p]['description'].keys())}
+                ##Instructions
+                Synthesize the provided descriptions into a unified scouting report.
+                Avoid listing individual sections separately—integrate the information naturally.
+                Maintain a professional tone, focusing on interpretation rather than raw data.
+                Do not include references to external comparisons, statistics, or missing data.
+                Ensure the summary is cohesive, presenting the player as a complete profile rather than a segmented analysis.
+                ##Input
+                """
                 for k, desc in prompt_dataset[p]['description'].items():
                     summary_prompt += f'{k}: {desc}\n'
 
