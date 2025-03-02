@@ -90,6 +90,9 @@ if __name__ == '__main__':
                 Maintain a professional tone, focusing on interpretation rather than raw data.
                 Do not include references to external comparisons, statistics, or missing data.
                 Ensure the summary is cohesive, presenting the player as a complete profile rather than a segmented analysis.
+                Use [END_REPORT] when you end the description
+                Avoid consideration about the generated report in conclusions
+                
                 ##Input
                 """
                 for k, desc in prompt_dataset[p]['description'].items():
