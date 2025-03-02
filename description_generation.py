@@ -65,12 +65,12 @@ if __name__ == '__main__':
                         outputs = model.generate(input_ids=input_ids,
                                                 attention_mask=attention_mask, 
                                                 max_new_tokens=300, 
-                                                temperature=1,     # Modifica la temperatura qui
+                                                temperature=0.7,     # Modifica la temperatura qui
                                                 top_k=20,            # Filtraggio top-k opzionale
                                                 top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
                                                 do_sample=True, 
                                                 #pad_token_id=tokenizer.eos_token_id
-                                                repetition_penalty=1.2
+                                                repetition_penalty=1.05
                                                 ,pad_token_id=tokenizer.eos_token_id
                                                 #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
 
