@@ -76,11 +76,12 @@ if __name__ == '__main__':
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                     prompt_dataset[p]['description'][k] = generated_text
-
+                    
+                print(p, prompt_dataset[p]['description'].keys())
                 summary_prompt = "Give me a very concise summary of the following report:"
                 for k, desc in prompt_dataset[p]['description'].items():
-                    print(p,k)
                     summary_prompt += f'{k}: {desc}\n'
+
                 summary_prompt+= "###Generated Report:"
 
                 input_ids = tokenizer(summary_prompt, return_tensors="pt", truncation=True).input_ids.to(device)
@@ -101,6 +102,7 @@ if __name__ == '__main__':
                                                 )
                 summary_text = tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                 prompt_dataset[p]['description']['summary'] = summary_text
+                print(p, prompt_dataset[p]['description'].keys())
 
                 count+=1
 
