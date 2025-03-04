@@ -97,7 +97,8 @@ if __name__ == '__main__':
                 Position: {prompt_dataset[p]['position']}
                 """
                 for k, desc in prompt_dataset[p]['description'].items():
-                    summary_prompt += f'{k}: {desc}\n'
+                    desc_clean = desc.split('[END_REPORT]')[0]
+                    summary_prompt += f'{k}: {desc_clean}\n'
 
                 summary_prompt+= "###Generated Report:"
 
