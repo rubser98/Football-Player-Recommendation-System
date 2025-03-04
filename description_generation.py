@@ -64,7 +64,7 @@ if __name__ == '__main__':
                     with torch.no_grad():
                         outputs = model.generate(input_ids=input_ids,
                                                 attention_mask=attention_mask, 
-                                                max_new_tokens=300, 
+                                                max_new_tokens=500, 
                                                 temperature=0.7,     # Modifica la temperatura qui
                                                 top_k=20,            # Filtraggio top-k opzionale
                                                 top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
