@@ -85,6 +85,13 @@ if __name__ == '__main__':
                 Generate a concise and coherent summary (150 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
                 {list(prompt_dataset[p]['description'].keys())}
 
+                ##Reasoning process
+                1. Based on the position of the player, classificates each performance areas 
+                (e.g Forwarder: Shooting -> Very pertinent , Defense -> less pertitent; Defender: Shooting -> less pertintent, Defense very pertinent)
+                2. Focus more about pertinent areas than less pertinent ones
+                3. For each area detect if there is any skill or aspect of the game where the player excel.
+
+
                 ##Output Guidelines
                 Synthesize the provided descriptions into a unified scouting report.
                 The description must focus about principal strength of the player in area more related to it's position
