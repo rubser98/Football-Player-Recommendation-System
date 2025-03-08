@@ -32,7 +32,8 @@ if __name__ == '__main__':
         filename = f'{args.dataset_dir}/prova_stats_v2.json'
 
     else: 
-        filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
+        #filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
+        filename = f'{args.dataset_dir}/prova_team.json'
 
     prompt_dataset= utils.readJson(filename)
 
@@ -93,58 +94,57 @@ if __name__ == '__main__':
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                     prompt_dataset[p]['description'][k] = cleanDesc(generated_text)
 
-                print(p, prompt_dataset[p]['description'].keys())
-                summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
-                ##Task
-                Generate a concise and coherent summary (150 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
-                {list(prompt_dataset[p]['description'].keys())}
+                if args.is_player:
+                    summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
+                    ##Task
+                    Generate a concise and coherent summary (150 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
+                    {list(prompt_dataset[p]['description'].keys())}
 
-                ##Reasoning process
-                1. Based on the position of the player, classificates each performance areas 
-                (e.g Forwarder: Shooting -> Very pertinent , Defense -> less pertitent; Defender: Shooting -> less pertintent, Defense very pertinent)
-                2. Focus more about pertinent areas than less pertinent ones
-                3. For each area detect if there is any skill or aspect of the game where the player excel.
+                    ##Reasoning process
+                    1. Based on the position of the player, classificates each performance areas 
+                    (e.g Forwarder: Shooting -> Very pertinent , Defense -> less pertitent; Defender: Shooting -> less pertintent, Defense very pertinent)
+                    2. Focus more about pertinent areas than less pertinent ones
+                    3. For each area detect if there is any skill or aspect of the game where the player excel.
 
 
-                ##Output Guidelines
-                Synthesize the provided descriptions into a unified scouting report.
-                The description must focus about principal strength of the player in area more related to it's position
-                Avoid listing individual sections separately—integrate the information naturally.
-                Maintain a professional tone, focusing on interpretation rather than raw data.
-                Do not include references to external comparisons, statistics, or missing data.
-                Ensure the summary is cohesive, presenting the player as a complete profile rather than a segmented analysis.
-                Use [START_REPORT] when you start and [END_REPORT] when you end the description
-                The report must focus on charateristics related to the position (e.g defender should focus on defensive skills)
+                    ##Output Guidelines
+                    Synthesize the provided descriptions into a unified scouting report.
+                    The description must focus about principal strength of the player in area more related to it's position
+                    Avoid listing individual sections separately—integrate the information naturally.
+                    Maintain a professional tone, focusing on interpretation rather than raw data.
+                    Do not include references to external comparisons, statistics, or missing data.
+                    Ensure the summary is cohesive, presenting the player as a complete profile rather than a segmented analysis.
+                    Use [START_REPORT] when you start and [END_REPORT] when you end the description
+                    The report must focus on charateristics related to the position (e.g defender should focus on defensive skills)
 
-                ##Input
-                Position: {prompt_dataset[p]['position']}
-                """
-                for k, desc in prompt_dataset[p]['description'].items():
-                     #desc_clean = desc.split('[END_REPORT]')[0]
-                    summary_prompt += f'{k}: {desc}\n'
+                    ##Input
+                    Position: {prompt_dataset[p]['position']}
+                    """
+                
+                    for k, desc in prompt_dataset[p]['description'].items():
+                        #desc_clean = desc.split('[END_REPORT]')[0]
+                        summary_prompt += f'{k}: {desc}\n'
 
-                summary_prompt+= "###Generated Report:"
+                    summary_prompt+= "###Generated Report:"
 
-                input_ids = tokenizer(summary_prompt, return_tensors="pt", truncation=True).input_ids.to(device)
-                attention_mask = tokenizer(summary_prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
+                    input_ids = tokenizer(summary_prompt, return_tensors="pt", truncation=True).input_ids.to(device)
+                    attention_mask = tokenizer(summary_prompt, return_tensors="pt", padding=True, truncation=True).attention_mask.to(device)
 
-                with torch.no_grad():
-                        summary_outputs = model.generate(input_ids=input_ids,
-                                                attention_mask=attention_mask, 
-                                                max_new_tokens=300, 
-                                                temperature=1,     # Modifica la temperatura qui
-                                                top_k=20,            # Filtraggio top-k opzionale
-                                                top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
-                                                do_sample=True, 
-                                                #pad_token_id=tokenizer.eos_token_id
-                                                repetition_penalty=1.2
-                                                ,pad_token_id=tokenizer.eos_token_id
-                                                #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
-                                                )
-                print(len(tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")))
-                summary_text = tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
-                prompt_dataset[p]['description']['summary'] = summary_text
-                print(p, prompt_dataset[p]['description'].keys())
+                    with torch.no_grad():
+                            summary_outputs = model.generate(input_ids=input_ids,
+                                                    attention_mask=attention_mask, 
+                                                    max_new_tokens=300, 
+                                                    temperature=1,     # Modifica la temperatura qui
+                                                    top_k=20,            # Filtraggio top-k opzionale
+                                                    top_p=0.8,           # Nucleus sampling (top-p sampling) opzionale
+                                                    do_sample=True, 
+                                                    #pad_token_id=tokenizer.eos_token_id
+                                                    repetition_penalty=1.2
+                                                    ,pad_token_id=tokenizer.eos_token_id
+                                                    #,eos_token_id=tokenizer.convert_tokens_to_ids("[FINE REPORT]")
+                                                    )
+                    summary_text = tokenizer.decode(summary_outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
+                    prompt_dataset[p]['description']['summary'] = summary_text
 
                 count+=1
 
