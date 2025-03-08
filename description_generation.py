@@ -4,6 +4,20 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from tqdm import tqdm
 
+def cleanDesc(desc):
+    c_square = desc.count('[END_REPORT]')
+    c_plain = desc.count('END_REPORT')
+    c = max(c_square, c_plain)
+    sep = '[END_REPORT]' if c_square > 0 else 'END_REPORT'
+    if c == 0:
+        sep = "### Input Data:"
+    splits = desc.split(sep)          
+    splits = [s.strip() for s in splits]
+    if splits[0] == '':
+        return splits[1]
+    else:
+        return splits[0]
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
@@ -77,7 +91,7 @@ if __name__ == '__main__':
                                                 )
                     
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
-                    prompt_dataset[p]['description'][k] = generated_text
+                    prompt_dataset[p]['description'][k] = cleanDesc(generated_text)
 
                 print(p, prompt_dataset[p]['description'].keys())
                 summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
@@ -106,8 +120,8 @@ if __name__ == '__main__':
                 Position: {prompt_dataset[p]['position']}
                 """
                 for k, desc in prompt_dataset[p]['description'].items():
-                    desc_clean = desc.split('[END_REPORT]')[0]
-                    summary_prompt += f'{k}: {desc_clean}\n'
+                     #desc_clean = desc.split('[END_REPORT]')[0]
+                    summary_prompt += f'{k}: {desc}\n'
 
                 summary_prompt+= "###Generated Report:"
 
