@@ -66,8 +66,6 @@ if __name__ == '__main__':
     with tqdm(total=len(prompt_dataset.keys()), desc="Processing players") as pbar:
 
         for p in prompt_dataset.keys():
-            pbar.update(1)
-
             #effettuo operazioni solo se non ho già generato descrizione per il giocatore nel caso di run multiple
             if 'description' not in prompt_dataset[p].keys():
                 prompts = prompt_dataset[p]['prompt']
@@ -149,7 +147,7 @@ if __name__ == '__main__':
 
                 count+=1
 
-
+            pbar.update(1)
             #ogni 10 descrizioni generate aggiorno il file target
             if count % 10 == 0:
                 utils.writeJson(prompt_dataset, filename)
