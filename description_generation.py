@@ -24,6 +24,7 @@ if __name__ == '__main__':
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
     parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     parser.add_argument("--is_player", type=int, required=False, default=1, help="Choose if run generation for players or teams.")
+    parser.add_argument("--summary", type=int, required=False, default=1, help="Choose if run generation summary for players.")
     args = parser.parse_args()
 
     #vediamo con few shot prompting distillation
@@ -94,7 +95,7 @@ if __name__ == '__main__':
                     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True).split("###Generated Report:")[1]
                     prompt_dataset[p]['description'][k] = cleanDesc(generated_text)
 
-                if args.is_player:
+                if args.is_player and args.summary:
                     summary_prompt = f"""You are a professional soccer analyst specializing in player scouting and team strategy.
                     ##Task
                     Generate a concise and coherent summary (150 tokens) that encapsulates the overall playing style and strengths/weaknesses of a player based on performance areas:
