@@ -34,7 +34,8 @@ if __name__ == '__main__':
         filename = f'{args.dataset_dir}/player_descriptions.json'
     else: 
         #filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
-        filename = f'{args.dataset_dir}/prova_team.json'
+        #filename = f'{args.dataset_dir}/prova_team.json'
+        filename = f'{args.dataset_dir}/team_descriptions.json'
 
     prompt_dataset= utils.readJson(filename)
 
