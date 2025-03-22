@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
-    parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
+    #parser.add_argument("--lang", type=str, required=True, choices=["it", "en"], help="Language option. Choose between 'it' (Italian) or 'en' (English).")
     parser.add_argument("--is_player", type=int, required=False, default=1, help="Choose if run generation for players or teams.")
     parser.add_argument("--summary", type=int, required=False, default=1, help="Choose if run generation summary for players.")
     args = parser.parse_args()
