@@ -20,11 +20,14 @@ class PlayerRecommendation:
         self.embedding_model = HuggingFaceEmbeddings(model_name=embedding_model_name)
         self.dir = dir
         # Database vettoriale (ChromaDB)
+        
         self.vector_db_players = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_players")
         self.vector_db_teams = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_teams")
         
-        self.initialize_players_db()
-        self.initialize_teams_db()
+        if self.vector_db_players.count() == 0:
+            self.initialize_players_db()
+        if self.vector_db_teams.count() == 0:
+            self.initialize_teams_db()
         
         # LLM per generare raccomandazioni
         self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
