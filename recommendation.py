@@ -75,7 +75,7 @@ class PlayerRecommendation:
         docs = []
         with tqdm(total=len(players_desc.keys()), desc="Processing players") as pbar:    
             for id, desc_dict in players_desc.items():
-                print(id, desc_dict)
+                print(id, desc_dict['name'], desc_dict.keys())
                 desc = ' '.join(list(desc_dict['description'].values()))
                 pos_str = desc_dict['position_str']
                 meta = {}
