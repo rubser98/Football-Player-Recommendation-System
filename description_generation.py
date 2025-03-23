@@ -31,7 +31,8 @@ if __name__ == '__main__':
     if args.is_player:
         #filename = f'{args.dataset_dir}/players_description_{args.lang}_v4_post.json'
         #filename = f'{args.dataset_dir}/prova_stats_v2.json'
-        filename = f'{args.dataset_dir}/player_descriptions.json'
+        #filename = f'{args.dataset_dir}/player_descriptions.json'
+        filename = f'{args.dataset_dir}/player_descriptions_mancanti.json'
     else: 
         #filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
         #filename = f'{args.dataset_dir}/prova_team.json'
