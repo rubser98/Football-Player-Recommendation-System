@@ -23,10 +23,10 @@ class PlayerRecommendation:
         
         self.vector_db_players = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_players")
         self.vector_db_teams = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_teams")
-        
-        if self.vector_db_players.count() == 0:
+
+        if self.vector_db_players._collection.count() == 0:
             self.initialize_players_db()
-        if self.vector_db_teams.count() == 0:
+        if self.vector_db_teams._collection.count() == 0:
             self.initialize_teams_db()
         
         # LLM per generare raccomandazioni
