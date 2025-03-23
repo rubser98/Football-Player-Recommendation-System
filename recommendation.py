@@ -101,7 +101,7 @@ class PlayerRecommendation:
         teams = teams | readJson(f'{self.dir}/team_descriptions_mancanti.json')
         team_description = [t['description']['general'] for t in teams.values()]
         team_name = list(teams.keys())
-        self.vector_db_teams.add_texts(team_description, metadatas=[{"name": team_name}])
+        self.vector_db_teams.add_texts(team_description, metadatas=team_name)
 
 
     def retrieve_players(self, team_desc: str, role: str, top_k: int = 5) -> List[Dict]:
