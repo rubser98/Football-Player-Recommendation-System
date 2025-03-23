@@ -63,8 +63,8 @@ class PlayerRecommendation:
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
 
     def initialize_players_db(self):
-        players_desc = readJson(f'{self.dir}/team_descriptions.json')
-        players_desc = players_desc | readJson(f'{self.dir}/team_descriptions_mancanti.json')
+        players_desc = readJson(f'{self.dir}/player_descriptions.json')
+        players_desc = players_desc | readJson(f'{self.dir}/player_descriptions_mancanti.json')
         player_meta = readJson(f'{self.dir}/transfermarkt_fbref_dataset.json')
         player_meta_manc = readJson(f'{self.dir}/transfermarkt_fbref_mancanti.json')
         #merge giocatori mancanti con dataset originale
@@ -75,7 +75,7 @@ class PlayerRecommendation:
         docs = []
         with tqdm(total=len(players_desc.keys()), desc="Processing players") as pbar:    
             for id, desc_dict in players_desc.items():
-                print(id, desc_dict.keys())
+ 
                 desc = ' '.join(list(desc_dict['description'].values()))
                 pos_str = desc_dict['position_str']
                 meta = {}
