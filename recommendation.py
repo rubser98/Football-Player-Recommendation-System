@@ -75,7 +75,7 @@ class PlayerRecommendation:
         docs = []
         with tqdm(total=len(players_desc.keys()), desc="Processing players") as pbar:    
             for id, desc_dict in players_desc.items():
-
+                print(id, desc_dict)
                 desc = ' '.join(list(desc_dict['description'].values()))
                 pos_str = desc_dict['position_str']
                 meta = {}
@@ -131,7 +131,7 @@ class PlayerRecommendation:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate player and team descriptions")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the directory containing the dataset file.")
-    
+
     args = parser.parse_args()
 
 
