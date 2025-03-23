@@ -90,7 +90,7 @@ class PlayerRecommendation:
                 pbar.update(1)
 
         """Aggiunge giocatori alla knowledge base."""
-        docs = [(p["description"], {"id": p["id"], "name": p["name"]}) for p in players_desc]
+        #docs = [(p["description"], {"id": p["id"], "name": p["name"]}) for p in players_desc]
         self.vector_db.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
     
     def initialize_teams_db(self):
