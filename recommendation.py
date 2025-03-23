@@ -101,6 +101,7 @@ class PlayerRecommendation:
         teams = teams | readJson(f'{self.dir}/team_descriptions_mancanti.json')
         team_description = [t['description']['general'] for t in teams.values()]
         team_name = list(teams.keys())
+        team_name = [{'name': x} for x in team_name]
         self.vector_db_teams.add_texts(team_description, metadatas=team_name)
 
 
