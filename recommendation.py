@@ -94,7 +94,7 @@ class PlayerRecommendation:
 
         """Aggiunge giocatori alla knowledge base."""
         #docs = [(p["description"], {"id": p["id"], "name": p["name"]}) for p in players_desc]
-        self.vector_db.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
+        self.vector_db_players.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
     
     def initialize_teams_db(self):
         teams = readJson(f'{self.dir}/team_descriptions.json')
