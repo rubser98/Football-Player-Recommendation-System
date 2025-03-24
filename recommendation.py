@@ -29,8 +29,8 @@ class PlayerRecommendation:
         if self.vector_db_teams._collection.count() == 0:
             self.initialize_teams_db()
         
-        leao = self.get_player_by_name("Rafael Leao")
-        print(leao)
+        milan = self.get_team_by_name("Milan")
+        print(milan)
         '''
         # LLM per generare raccomandazioni
         self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
@@ -117,6 +117,13 @@ class PlayerRecommendation:
         
         return results['metadatas'][0] | {'description': results["documents"][0]}
 
+    def get_team_by_name(self, name: str) -> Dict:
+        results = self.vector_db_teams.get(where={"name": name})
+    
+        if not results["documents"]:
+            return {"error": "Team not found"}
+        
+        return results['metadatas'][0] | {'description': results["documents"][0]}
 
     
     def initialize_teams_db(self):
