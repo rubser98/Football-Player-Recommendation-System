@@ -96,6 +96,24 @@ class PlayerRecommendation:
         #docs = [(p["description"], {"id": p["id"], "name": p["name"]}) for p in players_desc]
         self.vector_db_players.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
     
+    def get_player_by_id(self, id: str) -> Dict:
+        results = self.vector_db_players.get(where={"id": id})
+    
+        if not results["documents"]:
+            return {"error": "Player not found"}
+        
+        return results['metadatas'][0] | results["documents"][0]
+    
+    def get_player_by_name(self, name: str) -> Dict:
+        results = self.vector_db_players.get(where={"name": name})
+    
+        if not results["documents"]:
+            return {"error": "Player not found"}
+        
+        return results['metadatas'][0] | results["documents"][0]
+
+
+    
     def initialize_teams_db(self):
         teams = readJson(f'{self.dir}/team_descriptions.json')
         teams = teams | readJson(f'{self.dir}/team_descriptions_mancanti.json')
@@ -140,4 +158,5 @@ if __name__ == '__main__':
 
 
     recommender = PlayerRecommendation(args.dataset_dir)
+    leao = recommender.get_player_by_name("Rafael Leao")
 
