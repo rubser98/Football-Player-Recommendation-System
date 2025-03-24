@@ -29,6 +29,9 @@ class PlayerRecommendation:
         if self.vector_db_teams._collection.count() == 0:
             self.initialize_teams_db()
         
+        leao = recommender.get_player_by_name("Rafael Leao")
+        print(leao)
+        '''
         # LLM per generare raccomandazioni
         self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
         
@@ -61,9 +64,11 @@ class PlayerRecommendation:
             {player_list}
             """
         )
+        
 
         # Chain per generare raccomandazioni
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
+        '''
 
     def initialize_players_db(self):
         players_desc = readJson(f'{self.dir}/player_descriptions.json')
