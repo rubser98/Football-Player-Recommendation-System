@@ -4,7 +4,8 @@ from description_generation import cleanDesc
 from langchain_community.vectorstores import Chroma
 #from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.chat_models import ChatOpenAI
+#from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOllama
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from typing import List, Dict
@@ -30,7 +31,8 @@ class PlayerRecommendation:
             self.initialize_teams_db()
 
         # LLM per generare raccomandazioni
-        self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
+        #self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
+        self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
         
         # Prompt per la raccomandazione
         self.prompt_template = PromptTemplate(
