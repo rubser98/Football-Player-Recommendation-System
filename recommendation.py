@@ -29,7 +29,7 @@ class PlayerRecommendation:
         if self.vector_db_teams._collection.count() == 0:
             self.initialize_teams_db()
         
-        leao = recommender.get_player_by_name("Rafael Leao")
+        leao = self.get_player_by_name("Rafael Leao")
         print(leao)
         '''
         # LLM per generare raccomandazioni
