@@ -64,8 +64,6 @@ class PlayerRecommendation:
             """
         )
         
-        print(self.llm)
-
         # Chain per generare raccomandazioni
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
         
