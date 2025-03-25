@@ -133,7 +133,7 @@ class PlayerRecommendation:
         self.vector_db_teams.add_texts(team_description, metadatas=team_name)
 
 
-    def retrieve_players(self, team_desc: str, role: str, top_k: int = 5) -> List[Dict]:
+    def retrieve_players(self, team_desc: str, role: str,role_filter:str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto."""
         query = f"{team_desc}. Looking for a {role}."
         query_embedding = self.embedding_model.embed_query(query)
