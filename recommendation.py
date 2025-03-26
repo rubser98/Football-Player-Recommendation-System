@@ -195,7 +195,7 @@ class PlayerRecommendation:
 
     def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        retrieved_players = self.retrieve_players(team_desc, role, top_k=top_k)
+        retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
             f"- ID: {p['id']}, Name: {p['name']}, Description: {p['description']}"
