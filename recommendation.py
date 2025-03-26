@@ -100,7 +100,7 @@ class PlayerRecommendation:
     def get_team_mapped(self, team):
 
         for tm_team in self.team_mapping.keys():
-            if tm_team.upper() == team:
+            if tm_team.upper() == team.upper():
                 return self.team_mapping[tm_team]
         
         raise KeyError("Team non trovato")
@@ -242,7 +242,6 @@ class PlayerRecommendation:
         
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
-                print(t['team'])
                 team_desc = self.get_team_by_name(t['team'])
                 rec = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'])
                 t['recommendation'] = rec
