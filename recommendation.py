@@ -13,6 +13,10 @@ from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
 import argparse
 import warnings
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from langchain_community.llms import HuggingFacePipeline
+from transformers import pipeline
+import torch
 warnings.filterwarnings("ignore")
 
 
@@ -34,7 +38,28 @@ class PlayerRecommendation:
 
         # LLM per generare raccomandazioni
         #self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
-        self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
+        model_name = 'Qwen/Qwen2.5-7B-Instruct'
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map="auto",
+            load_in_8bit=True, 
+            llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
+            offload_folder='offload_weights'  # Solo se è su CPU
+            )
+        
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+            # Imposta il token di padding
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token 
+
+        if model.config.pad_token_id is None:
+            model.config.pad_token_id = tokenizer.eos_token_id
+        # Carica il modello con supporto per CUDA (se disponibile)
+        hf_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0)
+        
+        #self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
+        self.llm = HuggingFacePipeline(pipeline=hf_pipeline)
 
         self.team_mapping = readJson(f'{dir}/merged_teams.json')
 
