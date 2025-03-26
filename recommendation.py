@@ -36,7 +36,7 @@ class PlayerRecommendation:
         #self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
         self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
 
-        self.team_mapping = readJson(f'{dir}/merged_team.json')
+        self.team_mapping = readJson(f'{dir}/merged_teams.json')
 
         
         # Prompt per la raccomandazione
@@ -213,7 +213,6 @@ class PlayerRecommendation:
     def main_recommendation(self, transfers_file):
 
         recommendations = []
-        print(f'{self.dir}/{transfers_file}')
         transfers = readJson(f'{self.dir}/{transfers_file}')
         
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
