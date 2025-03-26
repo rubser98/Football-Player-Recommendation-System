@@ -162,7 +162,7 @@ class PlayerRecommendation:
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
         
         # Step 1: Filtro per ruolo nel database
-        filtered_results = self.vector_db.get(where={"role": role_filter})
+        filtered_results = self.vector_db_players.get(where={"role": role_filter})
         
         if not filtered_results["documents"]:
             return []
