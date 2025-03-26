@@ -214,6 +214,7 @@ class PlayerRecommendation:
 
         recommendations = []
         transfers = readJson(f'{dir}/{transfers_file}')
+        print(transfers)
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
 
