@@ -1,4 +1,4 @@
-from utils import readJson
+from utils import readJson, writeJson
 from description_generation import cleanDesc
 #from langchain.vectorstores import Chroma
 from langchain_community.vectorstores import Chroma
@@ -10,9 +10,11 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from typing import List, Dict
 from tqdm import tqdm
+from sklearn.metrics.pairwise import cosine_similarity
+import argparse
 import warnings
 warnings.filterwarnings("ignore")
-import argparse
+
 
 class PlayerRecommendation:
     def __init__(self, dir, embedding_model_name="sentence-transformers/all-MiniLM-L6-v2", llm_model="qwen-7b-instruct"):
@@ -33,6 +35,9 @@ class PlayerRecommendation:
         # LLM per generare raccomandazioni
         #self.llm = ChatOpenAI(model=llm_model, temperature=0.7)
         self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
+
+        self.team_mapping = readJson(f'{dir}/merged_team.json')
+
         
         # Prompt per la raccomandazione
         self.prompt_template = PromptTemplate(
@@ -66,6 +71,14 @@ class PlayerRecommendation:
         
         # Chain per generare raccomandazioni
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
+
+    def get_team_mapped(self, team):
+
+        for tm_team in self.team_mapping.keys():
+            if tm_team.upper() == team:
+                return self.team_mapping[tm_team]
+        
+        raise KeyError("Team non trovato")
         
 
     def initialize_players_db(self):
@@ -116,7 +129,9 @@ class PlayerRecommendation:
         return results['metadatas'][0] | {'description': results["documents"][0]}
 
     def get_team_by_name(self, name: str) -> Dict:
-        results = self.vector_db_teams.get(where={"name": name})
+
+        team = self.get_team_mapped(name)
+        results = self.vector_db_teams.get(where={"name": team})
     
         if not results["documents"]:
             return {"error": "Team not found"}
@@ -132,7 +147,7 @@ class PlayerRecommendation:
         team_name = [{'name': x} for x in team_name]
         self.vector_db_teams.add_texts(team_description, metadatas=team_name)
 
-
+    '''
     def retrieve_players(self, team_desc: str, role: str,role_filter:str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto."""
         query = f"{team_desc}. Looking for a {role}."
@@ -140,10 +155,47 @@ class PlayerRecommendation:
         results = self.vector_db.similarity_search_by_vector(query_embedding, k=top_k)
         
         return [{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
+    '''
 
-    def recommend_players(self, team_desc: str, role: str) -> str:
+    def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
+        """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
+        filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
+        
+        # Step 1: Filtro per ruolo nel database
+        filtered_results = self.vector_db.get(where={"role": role_filter})
+        
+        if not filtered_results["documents"]:
+            return []
+
+        # Step 2: Creazione della query per la ricerca vettoriale
+        query = f"{team_desc}. Looking for a {role}."
+        query_embedding = self.embedding_model.embed_query(query)
+        
+        # Step 3: Estrarre gli embeddings dei risultati filtrati
+        filtered_embeddings = [
+            (doc, meta, self.embedding_model.embed_query(doc)) 
+            for doc, meta in zip(filtered_results["documents"], filtered_results["metadatas"])
+        ]
+
+        # Step 4: Calcolo della similarità tra query e documenti filtrati
+        scored_results = sorted(
+            filtered_embeddings,
+            key=lambda x: cosine_similarity([query_embedding], [x[2]])[0][0], 
+            reverse=True
+        )
+
+        # Step 5: Prendere i top_k più simili
+        top_players = scored_results[:top_k]
+
+        return [
+            {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
+            for p in top_players
+        ]
+
+
+    def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        retrieved_players = self.retrieve_players(team_desc, role, top_k=5)
+        retrieved_players = self.retrieve_players(team_desc, role, top_k=top_k)
         
         player_list = "\n".join([
             f"- ID: {p['id']}, Name: {p['name']}, Description: {p['description']}"
@@ -158,6 +210,23 @@ class PlayerRecommendation:
         
         return response
 
+    def main_recommendation(self, transfers_file):
+
+        recommendations = []
+        transfers = readJson(f'{dir}/{transfers_file}')
+        with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
+            for t in transfers:
+
+                team_desc = self.get_team_by_name(t['team'])
+                rec = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'])
+                t['recommendation'] = rec
+                recommendations.append(t)
+
+                pbar.update(1)
+        
+        writeJson(recommendations, f'{dir}/recommendations.json')
+
+
 
 
 if __name__ == '__main__':
@@ -166,7 +235,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
     recommender = PlayerRecommendation(args.dataset_dir)
-    leao = recommender.get_player_by_name("Rafael Leao")
+    recommender.main_recommendation('log_trasferimenti_gt.json')
+    
 
