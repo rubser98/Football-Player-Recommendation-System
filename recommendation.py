@@ -200,7 +200,7 @@ class PlayerRecommendation:
         
         # Step 3: Estrarre gli embeddings dei risultati filtrati
         filtered_embeddings = [
-            (doc, meta, self.embedding_model.embed_query(doc)) 
+            (cleanDesc(doc), meta, self.embedding_model.embed_query(cleanDesc(doc))) 
             for doc, meta in zip(filtered_results["documents"], filtered_results["metadatas"])
         ]
 

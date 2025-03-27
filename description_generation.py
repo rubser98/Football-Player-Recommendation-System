@@ -11,6 +11,9 @@ def cleanDesc(desc):
     sep = '[END_REPORT]' if c_square > 0 else 'END_REPORT'
     if c == 0:
         sep = "### Input Data:"
+        if desc.count(sep) == 0:
+            sep = "## New Input Data"
+        
     splits = desc.split(sep)          
     splits = [s.strip() for s in splits]
     if splits[0] == '':
