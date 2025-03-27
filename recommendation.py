@@ -187,13 +187,13 @@ class PlayerRecommendation:
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
         
         # Step 1: Filtro per ruolo nel database
-        filtered_results = self.vector_db_players.get(where={"role": role_filter})
+        filtered_results = self.vector_db_players.get(where={"tm_role": role})
         
         if not filtered_results["documents"]:
             return []
 
         # Step 2: Creazione della query per la ricerca vettoriale
-        query = f"{team_desc}. Looking for a {role}."
+        query = f"{team_desc}. Looking for a {role_filter}."
         query_embedding = self.embedding_model.embed_query(query)
         
         # Step 3: Estrarre gli embeddings dei risultati filtrati
