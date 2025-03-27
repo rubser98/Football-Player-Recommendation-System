@@ -44,7 +44,7 @@ class PlayerRecommendation:
             model_name,
             device_map="auto",
             load_in_8bit=False, 
-            llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
+            #llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
             offload_folder='offload_weights'  # Solo se è su CPU
             )
         
