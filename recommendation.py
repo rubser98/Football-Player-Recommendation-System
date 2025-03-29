@@ -231,7 +231,7 @@ class PlayerRecommendation:
         
         response = self.recommendation_chain.run(
             team_description=team_desc,
-            player_role=role,
+            player_role=role_filter,
             player_list=player_list
         )
         
