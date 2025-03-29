@@ -257,10 +257,16 @@ class PlayerRecommendation:
         query_embedding = self.embedding_model.embed_query(cleanDesc(query))
         
         # Step 3: Estrarre gli embeddings dei risultati filtrati
+        '''
         filtered_embeddings = [
             (cleanDesc(doc), meta, self.embedding_model.embed_query(cleanDesc(doc))) 
             for doc, meta in zip(filtered_results["documents"], filtered_results["metadatas"])
         ]
+        '''
+        filtered_embeddings = [
+        (cleanDesc(player["description"]), player, self.embedding_model.embed_query(cleanDesc(player["description"])))
+        for player in filtered_results]
+
 
         # Step 4: Calcolo della similarità tra query e documenti filtrati
         scored_results = sorted(
