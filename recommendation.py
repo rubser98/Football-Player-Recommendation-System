@@ -220,7 +220,7 @@ class PlayerRecommendation:
             return []
         
         ##Generated output:
-        query = self.retrieval_chain.run(team_description=team_desc['description'], player_role=role_filter).split('##Generated output:')[1]
+        query = self.retrieval_chain.run(team_description=team_desc[0]['description'], player_role=role_filter).split('##Generated output:')[1]
         print(cleanDesc(query))
         # Step 2: Creazione della query per la ricerca vettoriale
         #query = f"{team_desc}. Looking for a {role_filter}."
@@ -273,7 +273,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                response = self.recommend_players(team_desc['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
+                response = self.recommend_players(team_desc[0]['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
