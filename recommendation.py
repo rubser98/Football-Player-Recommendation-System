@@ -226,8 +226,25 @@ class PlayerRecommendation:
         expanded_roles.append(role)
         # Step 1: Filtro per ruolo nel database
         #filtered_results = self.vector_db_players.get(where={"tm_role": role})
-        all_players = self.vector_db_players.get_all()
-        filtered_results = [p for p in all_players if p.metadata["role"] in expanded_roles]
+        all_ids = self.vector_db.get()["ids"]
+
+        # Recupera i dati completi per gli ID
+        if all_ids:
+            all_data = self.vector_db.get(all_ids)
+        else:
+            return []
+
+        # Filtra i giocatori che appartengono ai ruoli specificati
+        filtered_results = [
+            {
+                "id": all_data["metadatas"][i]["id"],
+                "name": all_data["metadatas"][i]["name"],
+                "description": all_data["documents"][i],
+                "role": all_data["metadatas"][i]["role"]
+            }
+            for i in range(len(all_data["documents"]))
+            if all_data["metadatas"][i]["role"] in expanded_roles
+        ]
         
         if not filtered_results["documents"]:
             return []
