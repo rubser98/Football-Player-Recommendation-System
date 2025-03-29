@@ -57,9 +57,12 @@ class PlayerRecommendation:
             model.config.pad_token_id = tokenizer.eos_token_id
         # Carica il modello con supporto per CUDA (se disponibile)
         hf_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=500)
+
+        retrieval_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=200)
         
         #self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
         self.llm = HuggingFacePipeline(pipeline=hf_pipeline)
+        self.retrieval_llm = HuggingFacePipeline(pipeline=hf_pipeline)
 
         self.team_mapping = readJson(f'{dir}/merged_teams.json')
 
@@ -113,15 +116,13 @@ class PlayerRecommendation:
         - Team Description: {team_description}
         - Player Role: {player_role}
 
-
-
         ##Generated output:
         """
         )
         
         # Chain per generare raccomandazioni
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
-        self.retrieval_chain = LLMChain(llm=self.llm, prompt=self.prompt_per_retrieval)
+        self.retrieval_chain = LLMChain(llm=self.retrieval_llm, prompt=self.prompt_per_retrieval)
 
     def get_team_mapped(self, team):
 
@@ -131,7 +132,7 @@ class PlayerRecommendation:
         
         raise KeyError("Team non trovato")
         
-
+    
     def initialize_players_db(self):
         players_desc = readJson(f'{self.dir}/player_descriptions.json')
         players_desc = players_desc | readJson(f'{self.dir}/player_descriptions_mancanti.json')
