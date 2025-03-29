@@ -225,8 +225,8 @@ class PlayerRecommendation:
         expanded_roles = self.related_positions['it'][role]
         expanded_roles.append(role)
         # Step 1: Filtro per ruolo nel database
-        filtered_results = self.vector_db_players.get(where={"tm_role": role})
-        all_players = self.vector_db.get_all()
+        #filtered_results = self.vector_db_players.get(where={"tm_role": role})
+        all_players = self.vector_db_players.get_all()
         filtered_results = [p for p in all_players if p.metadata["role"] in expanded_roles]
         
         if not filtered_results["documents"]:
