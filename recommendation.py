@@ -200,15 +200,17 @@ class PlayerRecommendation:
         team_name = [{'name': x} for x in team_name]
         self.vector_db_teams.add_texts(team_description, metadatas=team_name)
 
-    '''
-    def retrieve_players(self, team_desc: str, role: str,role_filter:str, top_k: int = 10) -> List[Dict]:
+    
+    def retrieve_players_without_filter(self, team_desc: str, role: str, role_filter:str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto."""
-        query = f"{team_desc}. Looking for a {role}."
+        #query = f"{team_desc}. Looking for a {role}."
+        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
+        query = cleanDesc(query)
         query_embedding = self.embedding_model.embed_query(query)
         results = self.vector_db.similarity_search_by_vector(query_embedding, k=top_k)
         
         return [{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
-    '''
+    
 
     def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
@@ -252,13 +254,15 @@ class PlayerRecommendation:
 
     def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
+        #retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
+        retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
             f"- ID: {p['id']}, Name: {p['name']}, Description: {p['description']}"
             for p in retrieved_players
         ])
         
+        len(player_list)
         response = self.recommendation_chain.run(
             team_description=team_desc,
             player_role=role_filter,
