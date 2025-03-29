@@ -207,7 +207,7 @@ class PlayerRecommendation:
         query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
         query = cleanDesc(query)
         query_embedding = self.embedding_model.embed_query(query)
-        results = self.vector_db.similarity_search_by_vector(query_embedding, k=top_k)
+        results = self.vector_db_players.similarity_search_by_vector(query_embedding, k=top_k)
         
         return [{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
     
