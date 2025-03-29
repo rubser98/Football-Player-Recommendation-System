@@ -65,6 +65,7 @@ class PlayerRecommendation:
         self.retrieval_llm = HuggingFacePipeline(pipeline=retrieval_pipeline)
 
         self.team_mapping = readJson(f'{dir}/merged_teams.json')
+        self.related_positions = readJson(f'{dir}/related_positions.json')
 
         
         # Prompt per la raccomandazione
@@ -221,9 +222,12 @@ class PlayerRecommendation:
     def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
-        
+        expanded_roles = self.related_positions[role]
+        expanded_roles.append(role)
         # Step 1: Filtro per ruolo nel database
         filtered_results = self.vector_db_players.get(where={"tm_role": role})
+        all_players = self.vector_db.get_all()
+        filtered_results = [p for p in all_players if p.metadata["role"] in expanded_roles]
         
         if not filtered_results["documents"]:
             return []
@@ -259,8 +263,8 @@ class PlayerRecommendation:
 
     def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        #retr_desc,retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
-        retr_desc,retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
+        retr_desc,retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
+        #retr_desc,retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
             f"- ID: {p['id']}, Name: {p['name']}, Description: {p['description']}"
