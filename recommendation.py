@@ -220,7 +220,7 @@ class PlayerRecommendation:
             return []
         
         ##Generated output:
-        query = self.retrieval_chain.run(team_description=team_desc[0]['description'], player_role=role_filter).split('##Generated output:')[1]
+        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
         print(cleanDesc(query))
         # Step 2: Creazione della query per la ricerca vettoriale
         #query = f"{team_desc}. Looking for a {role_filter}."
