@@ -285,9 +285,9 @@ class PlayerRecommendation:
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
                 retr_desc,response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10)
-                response = cleanDesc(response.split('##Recommendation'))
+                response = response.split('##Recommendation')
                 prompt = response[0]
-                rec = response[1]
+                rec = cleanDesc(response[1])
                 t['recommendation'] = rec
                 t['prompt'] = prompt
                 t['retrieval_description'] = retr_desc
