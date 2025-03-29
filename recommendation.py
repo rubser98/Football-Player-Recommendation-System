@@ -226,11 +226,11 @@ class PlayerRecommendation:
         expanded_roles.append(role)
         # Step 1: Filtro per ruolo nel database
         #filtered_results = self.vector_db_players.get(where={"tm_role": role})
-        all_ids = self.vector_db.get()["ids"]
+        all_ids = self.vector_db_players.get()["id"]
 
         # Recupera i dati completi per gli ID
         if all_ids:
-            all_data = self.vector_db.get(all_ids)
+            all_data = self.vector_db_players.get(all_ids)
         else:
             return []
 
