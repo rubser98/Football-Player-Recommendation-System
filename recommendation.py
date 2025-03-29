@@ -102,23 +102,26 @@ class PlayerRecommendation:
 
         self.prompt_per_retrieval = PromptTemplate(
             input_variables=['team_description', 'player_role'],
-            template="""You are an expert football analyst. Your task is to analyze a team's playing style and generate a concise description of the key attributes the team values for a specific player role.  
-        ### Input Format:
-        - **Team Description:** {team_description}  
-        - **Player Role:** {player_role}  
+            template="""You are an expert football analyst. 
+            ##Task
+            Analyze a team's playing style and generate a concise description of the key attributes the team values for a specific player role.  
+            ### Input Format:
+            - **Team Description:** {team_description}  
+            - **Player Role:** {player_role}  
 
-        ### Output Format:
-        Provide a short paragraph (2-3 sentences) summarizing the key attributes that the team prioritizes for this role. Focus on tactical, technical, and physical qualities that align with the team's playing style. Avoid generic statements and be specific.
+            ### Output Format:
+            Provide a concise yet detailed paragraph (3-4 sentences) that highlights **specific attributes** the team looks for in this role. Focus on **technical, tactical, physical, and mental qualities** that align with the team's playing style. 
+            Ensure that the description is precise and role-specific, avoiding general or vague statements.  
 
-        ## Output Guidelines:
-        - Add [END_REPORT] at the end of summarization.
+            ## Output Guidelines:
+            - Add [END_REPORT] at the end of summarization.
 
-        **Input:**
-        - Team Description: {team_description}
-        - Player Role: {player_role}
+            **Input:**
+            - Team Description: {team_description}
+            - Player Role: {player_role}
 
-        ##Generated output:
-        """
+            ##Generated output:
+            """
         )
         
         # Chain per generare raccomandazioni
