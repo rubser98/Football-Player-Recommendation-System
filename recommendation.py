@@ -273,8 +273,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                print(team_desc)
-                response = self.recommend_players(team_desc[0]['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
+                response = self.recommend_players(team_desc['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
