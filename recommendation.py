@@ -243,7 +243,7 @@ class PlayerRecommendation:
                 "role": all_data["metadatas"][i]["tm_role"]
             }
             for i in range(len(all_data["documents"]))
-            if all_data["metadatas"][i]["role"] in expanded_roles
+            if all_data["metadatas"][i]["tm_role"] in expanded_roles
         ]
         
         if not filtered_results["documents"]:
