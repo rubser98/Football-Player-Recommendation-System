@@ -246,7 +246,7 @@ class PlayerRecommendation:
             if all_data["metadatas"][i]["tm_role"] in expanded_roles
         ]
         
-        if not filtered_results["documents"]:
+        if not filtered_results:
             return []
         
         ##Generated output:
