@@ -209,7 +209,7 @@ class PlayerRecommendation:
         query_embedding = self.embedding_model.embed_query(query)
         results = self.vector_db_players.similarity_search_by_vector(query_embedding, k=top_k)
         
-        return [{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
+        return query,[{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
     
 
     def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
@@ -224,7 +224,7 @@ class PlayerRecommendation:
         
         ##Generated output:
         query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
-        print(cleanDesc(query))
+        query = cleanDesc(query)
         # Step 2: Creazione della query per la ricerca vettoriale
         #query = f"{team_desc}. Looking for a {role_filter}."
         query_embedding = self.embedding_model.embed_query(cleanDesc(query))
@@ -244,9 +244,8 @@ class PlayerRecommendation:
 
         # Step 5: Prendere i top_k più simili
         top_players = scored_results[:top_k]
-        print(len(top_players))
 
-        return [
+        return query, [
             {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
             for p in top_players
         ]
@@ -254,8 +253,8 @@ class PlayerRecommendation:
 
     def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        #retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
-        retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
+        #retr_desc,retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
+        retr_desc,retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
             f"- ID: {p['id']}, Name: {p['name']}, Description: {p['description']}"
@@ -269,21 +268,22 @@ class PlayerRecommendation:
             player_list=player_list
         )
         
-        return response
+        return retr_desc, response
 
     def main_recommendation(self, transfers_file):
 
         recommendations = []
-        transfers = readJson(f'{self.dir}/{transfers_file}')[:5]
+        transfers = readJson(f'{self.dir}/{transfers_file}')[:3]
         
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                response = self.recommend_players(team_desc['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
+                retr_desc,response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
                 t['prompt'] = prompt
+                t['retrieval_description'] = retr_desc
                 recommendations.append(t)
 
                 pbar.update(1)
