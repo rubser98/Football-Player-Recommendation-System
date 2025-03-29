@@ -62,7 +62,7 @@ class PlayerRecommendation:
         
         #self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
         self.llm = HuggingFacePipeline(pipeline=hf_pipeline)
-        self.retrieval_llm = HuggingFacePipeline(pipeline=hf_pipeline)
+        self.retrieval_llm = HuggingFacePipeline(pipeline=retrieval_pipeline)
 
         self.team_mapping = readJson(f'{dir}/merged_teams.json')
 
@@ -92,7 +92,7 @@ class PlayerRecommendation:
             The justifications should be very concise, at maximum 20 tokens
 
             ##Output Guidelines:
-            - Use [END_REPORT] when you finish the recommendation.
+            - Add [END_REPORT] when you end the recommendation.
             ## Input data:
             Team Description: {team_description}
             Target Role: {player_role}
