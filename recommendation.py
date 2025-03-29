@@ -56,7 +56,7 @@ class PlayerRecommendation:
         if model.config.pad_token_id is None:
             model.config.pad_token_id = tokenizer.eos_token_id
         # Carica il modello con supporto per CUDA (se disponibile)
-        hf_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=1000)
+        hf_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=500)
         
         #self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
         self.llm = HuggingFacePipeline(pipeline=hf_pipeline)
