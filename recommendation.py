@@ -59,7 +59,7 @@ class PlayerRecommendation:
         hf_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
         
         #self.llm = ChatOllama(model="qwen-7b-instruct", temperature=0.7)
-        self.llm = HuggingFacePipeline(pipeline=hf_pipeline)
+        self.llm = HuggingFacePipeline(pipeline=hf_pipeline, max_new_tokens=1000)
 
         self.team_mapping = readJson(f'{dir}/merged_teams.json')
 
