@@ -106,11 +106,14 @@ class PlayerRecommendation:
         ### Output Format:
         Provide a short paragraph (2-3 sentences) summarizing the key attributes that the team prioritizes for this role. Focus on tactical, technical, and physical qualities that align with the team's playing style. Avoid generic statements and be specific.
 
-        ### Example:
+        ## Output Guidelines:
+        - Add [END_REPORT] at the end of summarization.
 
         **Input:**
         - Team Description: {team_description}
         - Player Role: {player_role}
+
+
 
         ##Generated output:
         """
@@ -216,11 +219,11 @@ class PlayerRecommendation:
             return []
         
         ##Generated output:
-        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
-        print(query)
+        query = self.retrieval_chain.run(team_description=team_desc['description'], player_role=role_filter).split('##Generated output:')[1]
+        print(cleanDesc(query))
         # Step 2: Creazione della query per la ricerca vettoriale
         #query = f"{team_desc}. Looking for a {role_filter}."
-        query_embedding = self.embedding_model.embed_query(query)
+        query_embedding = self.embedding_model.embed_query(cleanDesc(query))
         
         # Step 3: Estrarre gli embeddings dei risultati filtrati
         filtered_embeddings = [
@@ -269,7 +272,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
+                response = self.recommend_players(team_desc['description'], t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
