@@ -43,8 +43,8 @@ class PlayerRecommendation:
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
-            load_in_8bit=False, 
-            #llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
+            load_in_8bit=True, 
+            llm_int8_enable_fp32_cpu_offload=True,  # Solo se è su CPU
             offload_folder='offload_weights'  # Solo se è su CPU
             )
         
@@ -245,7 +245,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en']).split('##Recommendation')
+                response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=5).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
