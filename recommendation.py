@@ -222,7 +222,7 @@ class PlayerRecommendation:
     def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
-        expanded_roles = self.related_positions[role]
+        expanded_roles = self.related_positions['it'][role]
         expanded_roles.append(role)
         # Step 1: Filtro per ruolo nel database
         filtered_results = self.vector_db_players.get(where={"tm_role": role})
