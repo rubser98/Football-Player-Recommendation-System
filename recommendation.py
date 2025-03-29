@@ -95,9 +95,27 @@ class PlayerRecommendation:
             ##Recommendation
             """
         )
+
+        self.prompt_per_retrieval = """You are an expert football analyst. Your task is to analyze a team's playing style and generate a concise description of the key attributes the team values for a specific player role.  
+        ### Input Format:
+        - **Team Description:** {team_description}  
+        - **Player Role:** {player_role}  
+
+        ### Output Format:
+        Provide a short paragraph (2-3 sentences) summarizing the key attributes that the team prioritizes for this role. Focus on tactical, technical, and physical qualities that align with the team's playing style. Avoid generic statements and be specific.
+
+        ### Example:
+
+        **Input:**
+        - Team Description: {team_description}
+        - Player Role: {player_role}
+
+        ##Generated output:
+        """
         
         # Chain per generare raccomandazioni
         self.recommendation_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
+        self.retrieval_chain = LLMChain(llm=self.llm, prompt=self.prompt_per_retrieval)
 
     def get_team_mapped(self, team):
 
@@ -193,9 +211,12 @@ class PlayerRecommendation:
         
         if not filtered_results["documents"]:
             return []
-
+        
+        ##Generated output:
+        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
+        print(query)
         # Step 2: Creazione della query per la ricerca vettoriale
-        query = f"{team_desc}. Looking for a {role_filter}."
+        #query = f"{team_desc}. Looking for a {role_filter}."
         query_embedding = self.embedding_model.embed_query(query)
         
         # Step 3: Estrarre gli embeddings dei risultati filtrati
@@ -245,7 +266,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=5).split('##Recommendation')
+                response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10).split('##Recommendation')
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
