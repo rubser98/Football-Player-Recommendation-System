@@ -82,13 +82,14 @@ class PlayerRecommendation:
 		      The description contains a scouting report outlining the player's playing style, strengths, weaknesses, and key attributes.
 		
             ##Required output:
-		    Provide a ranked list of recommended players in descending order of relevance. The output format must be as follows:
+		    Provide a ranked list of recommended players in descending order of relevance. Select 3 top recommendations.
+            The output format must be as follows:
             Output format:
             - ID: <player_id>
             - Name: <player_name>
             - Justification: <reason_for_recommendation>
             Each justification should explain why the player is a good fit based on tactical compatibility, technical attributes, and adaptability to the team's playing style. If no ideal player is found, suggest the closest alternatives.
-
+            The justifications should be very concise, at maximum 20 tokens
             ## Input data:
             Team Description: {team_description}
             Target Role: {player_role}
@@ -241,6 +242,7 @@ class PlayerRecommendation:
 
         # Step 5: Prendere i top_k più simili
         top_players = scored_results[:top_k]
+        print(len(top_players))
 
         return [
             {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
