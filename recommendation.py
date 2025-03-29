@@ -240,7 +240,7 @@ class PlayerRecommendation:
                 "id": all_data["metadatas"][i]["id"],
                 "name": all_data["metadatas"][i]["name"],
                 "description": all_data["documents"][i],
-                "role": all_data["metadatas"][i]["role"]
+                "role": all_data["metadatas"][i]["tm_role"]
             }
             for i in range(len(all_data["documents"]))
             if all_data["metadatas"][i]["role"] in expanded_roles
