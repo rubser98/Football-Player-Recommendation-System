@@ -90,6 +90,9 @@ class PlayerRecommendation:
             - Justification: <reason_for_recommendation>
             Each justification should explain why the player is a good fit based on tactical compatibility, technical attributes, and adaptability to the team's playing style. If no ideal player is found, suggest the closest alternatives.
             The justifications should be very concise, at maximum 20 tokens
+
+            ##Output Guidelines:
+            - Use [END_REPORT] when you finish the recommendation.
             ## Input data:
             Team Description: {team_description}
             Target Role: {player_role}
@@ -282,7 +285,7 @@ class PlayerRecommendation:
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
                 retr_desc,response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10)
-                response = response.split('##Recommendation')
+                response = cleanDesc(response.split('##Recommendation'))
                 prompt = response[0]
                 rec = response[1]
                 t['recommendation'] = rec
