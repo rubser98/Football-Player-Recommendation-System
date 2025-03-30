@@ -238,7 +238,7 @@ class PlayerRecommendation:
         return query,[{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
     
 
-    def retrieve_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
+    def retrieve_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
         expanded_roles = self.related_positions['it'][role]
@@ -263,6 +263,7 @@ class PlayerRecommendation:
             }
             for i in range(len(all_data["documents"]))
             if all_data["metadatas"][i]["tm_role"] in expanded_roles
+            and all_data["metadatas"][i]['team'] != team_name
         ]
         
         if not filtered_results:
@@ -303,9 +304,9 @@ class PlayerRecommendation:
         ]
 
 
-    def recommend_players(self, team_desc: str, role: str, role_filter: str, top_k: int = 10) -> str:
+    def recommend_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        retr_desc,retrieved_players = self.retrieve_players(team_desc, role, role_filter, top_k=top_k)
+        retr_desc,retrieved_players = self.retrieve_players(team_desc, team_name, role, role_filter, top_k=top_k)
         #retr_desc,retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
@@ -331,7 +332,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                retr_desc,response = self.recommend_players(team_desc, t['tm_role'], t['tm_role_en'], top_k=10)
+                retr_desc,response = self.recommend_players(team_desc['description'], team_desc['name'], t['tm_role'], t['tm_role_en'], top_k=10)
                 response = response.split('##Recommendation')
                 prompt = response[0]
                 rec = cleanDesc(response[1])
