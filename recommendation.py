@@ -326,7 +326,7 @@ class PlayerRecommendation:
     def main_recommendation(self, transfers_file):
 
         recommendations = []
-        transfers = readJson(f'{self.dir}/{transfers_file}')[:20]
+        transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
         
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
