@@ -92,7 +92,7 @@ class PlayerRecommendation:
 		      The description contains a scouting report outlining the player's playing style, strengths, weaknesses, and key attributes.
 		
             ##Required output:
-		    Provide a ranked list of recommended players in descending order of relevance. Select 3 top recommendations.
+		    Provide a ranked list of recommended players in descending order of relevance. Select 10 top recommendations.
             The output format must be as follows:
             Output format:
             - ID: <player_id>
@@ -332,7 +332,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                retr_desc,response = self.recommend_players(team_desc['description'], team_desc['name'], t['tm_role'], t['tm_role_en'], top_k=10)
+                retr_desc,response = self.recommend_players(team_desc['description'], team_desc['name'], t['tm_role'], t['tm_role_en'], top_k=20)
                 response = response.split('##Recommendation')
                 prompt = response[0]
                 rec = cleanDesc(response[1])
