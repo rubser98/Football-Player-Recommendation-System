@@ -77,11 +77,10 @@ class PlayerRecommendation:
             You are given a team's tactical and technical description along with a specific role they are looking to fill. Your task is to analyze the team's needs and recommend the most suitable players from a predefined pool.
             
             ## Reasoning process
-            - **Understand the team's tactical style**: Analyze the given team description to extract key tactical principles, preferred playing style, and required player attributes.
-            - **Identify ideal role characteristics**: Define the essential skills and attributes needed for the given position based on the team's tactical demands.
-            - **Evaluate available players**: Compare each player's scouting report against the ideal profile.
-            - **Rank players based on suitability**: Prioritize players who align best with tactical needs, technical skills, and adaptability.
-            - **Justify selections concisely**: Provide a clear and short reasoning for why each player fits the team and role.
+            - Detect each skill required for the role
+            - Evaluate available players: Compare each player's scouting report against the each detected skill.
+            - Rank players based on whos are better for each skill
+            - Justify selections concisely: Provide a clear and short reasoning for why each player fits the team and role.
 
 
             ## Input format:
