@@ -121,9 +121,16 @@ class PlayerRecommendation:
             template="""You are an expert football analyst. 
             ##Task
             Analyze a team's playing style and generate a concise description of the key attributes the team values for a specific player role.  
+            
+            ## Reasoning Process:
+            - **Understand the team's tactical identity**: Analyze the provided team description to determine their style of play, formation tendencies, and strategic principles.  
+            - **Identify role-specific demands**:  Extract the key responsibilities of the given player role within the team's system.  
+            - **Determine essential attributes**: Define the technical, tactical, physical, and mental qualities the team prioritizes for this role.  
+            - **Generate a tailored description**: Summarize the key characteristics in a structured and role-specific way, avoiding generalizations.  
+            
             ### Input Format:
-            - **Team Description:** {team_description}  
-            - **Player Role:** {player_role}  
+            - Team description: Team's tactical and technical description
+		    - Target role: Position where the team is looking for a players
 
             ### Output Format:
             Provide a concise yet detailed paragraph (3-4 sentences) that highlights **specific attributes** the team looks for in this role. Focus on **technical, tactical, physical, and mental qualities** that align with the team's playing style. 
