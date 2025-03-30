@@ -70,15 +70,24 @@ class PlayerRecommendation:
         
         # Prompt per la raccomandazione
         self.prompt_template = PromptTemplate(
-            input_variables=["team_description", "player_role", "player_list"],
+            input_variables=["team_description", "player_role","role_skill", "player_list"],
             template="""
             You are a football scouting and tactical analysis expert. 
             ## Task:
             You are given a team's tactical and technical description along with a specific role they are looking to fill. Your task is to analyze the team's needs and recommend the most suitable players from a predefined pool.
             
+            ## Reasoning process
+            - **Understand the team's tactical style**: Analyze the given team description to extract key tactical principles, preferred playing style, and required player attributes.
+            - **Identify ideal role characteristics**: Define the essential skills and attributes needed for the given position based on the team's tactical demands.
+            - **Evaluate available players**: Compare each player's scouting report against the ideal profile.
+            - **Rank players based on suitability**: Prioritize players who align best with tactical needs, technical skills, and adaptability.
+            - **Justify selections concisely**: Provide a clear and short reasoning for why each player fits the team and role.
+
+
             ## Input format:
 		    - Team description: Team's tactical and technical description
 		    - Target role: Position where the team is looking for a players
+            - Required characteristics: A list of key attributes and skills the player should have to fit the role. 
 		    - Available player pool: A list of players, where each player has the following information: id, name, description
 		      The description contains a scouting report outlining the player's playing style, strengths, weaknesses, and key attributes.
 		
@@ -93,10 +102,13 @@ class PlayerRecommendation:
             The justifications should be very concise, at maximum 20 tokens
 
             ##Output Guidelines:
-            - Add [END_REPORT] when you end the recommendation.
+            - Justifications must be concise (max **20 tokens**).  
+            - Add [END_REPORT] at the end of the recommendation. 
+
             ## Input data:
             Team Description: {team_description}
             Target Role: {player_role}
+            Required characteristics: {role_skill}
             Available Players:
             {player_list}
 
@@ -298,6 +310,7 @@ class PlayerRecommendation:
         response = self.recommendation_chain.run(
             team_description=team_desc,
             player_role=role_filter,
+            role_skill=retr_desc,
             player_list=player_list
         )
         
