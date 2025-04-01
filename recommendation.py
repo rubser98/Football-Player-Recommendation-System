@@ -17,6 +17,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from langchain_community.llms import HuggingFacePipeline
 from transformers import pipeline
 import torch
+import numpy as np
 warnings.filterwarnings("ignore")
 
 
@@ -322,6 +323,74 @@ class PlayerRecommendation:
         )
         
         return retr_desc, response
+    
+    def get_ids_recommendation(self, rec):
+    
+        ids_rec = []
+        for id_str in rec['recommendation'].split('- ID: '):
+            id = id_str[:8]
+            ids_rec.append(id)
+        
+        ids_ret = []
+        for id_str in rec['prompt'].split('- ID: '):
+            id = id_str[:8]
+            ids_ret.append(id)
+
+        return ids_rec[1:], ids_ret[2:]
+    
+    def verify_similarity_in_rec(self, id, ids_rec, threshold=0.7):
+        # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
+        player_embedding = self.vector_db_players.get_embedding(where={'id': id})    
+        if player_embedding is None:
+            raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
+        results = {}
+        for rec_id in ids_rec:
+            rec_embedding = self.vector_db_players.get_embedding(where={'id': rec_id})
+            
+            if rec_embedding is None:
+                results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
+                continue
+            
+            # Calcola la similarità coseno
+            similarity = cosine_similarity(
+                np.array(player_embedding).reshape(1, -1),
+                np.array(rec_embedding).reshape(1, -1)
+            )[0][0]
+            
+            # Assegna 1 se supera la soglia, altrimenti 0
+            results[rec_id] = 1 if similarity >= threshold else 0
+    
+        return results
+    
+    def evaluate_recommendations(self, recommendations):
+        n = len(recommendations)
+        hit_rec = 0
+        hit_ret = 0
+        similarity = {}
+        for rec in recommendations:
+            id = rec['id']
+            ids_rec, ids_ret = self.get_ids_recommendation(rec)
+            if id in ids_rec:
+                hit_rec+=1
+            if id in ids_ret:
+                print(rec['player_name'])
+                hit_ret+=1
+            
+            similarity_rec = self.verify_similarity_in_rec(id, ids_rec)
+            similarity_ret = self.verify_similarity_in_rec(id, ids_ret)
+            similarity[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
+        
+        eval = {}
+        eval['hit_rec'] = hit_rec
+        eval['hit_ret'] = hit_ret
+        eval['similarity'] = similarity
+
+        return eval
+
+        
+
+
+
 
     def main_recommendation(self, transfers_file):
 
@@ -341,8 +410,11 @@ class PlayerRecommendation:
                 recommendations.append(t)
 
                 pbar.update(1)
-        
+
         writeJson(recommendations, f'{self.dir}/recommendations.json')
+        eval = self.evaluate_recommendations(recommendations)
+        writeJson(eval, f'{self.dir}/evaluation.json')
+
 
 
 
