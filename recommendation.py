@@ -197,7 +197,7 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0]}
+        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': results["embeddings"][0]}
     
     def get_player_by_name(self, name: str) -> Dict:
         results = self.vector_db_players.get(where={"name": name})
@@ -340,21 +340,22 @@ class PlayerRecommendation:
     
     def verify_similarity_in_rec(self, id, ids_rec, threshold=0.7):
         # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
-        player_data = self.vector_db_players.get(where={'id': id})
+        player_data = self.get_player_by_id(id)
 
         if not player_data or not player_data.get('embeddings'):
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
-        player_embedding = np.array(player_data['embeddings'][0])
+        
+        player_embedding = np.array(player_data['embedding'][0])
 
         results = {}
         for rec_id in ids_rec:
-            rec_data = self.vector_db_players.get(where={'id': rec_id})
+            rec_data = self.get_player_by_id(rec_id)
         
             if not rec_data or 'embeddings' not in rec_data:
                 results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
                 continue
             
-            rec_embedding = np.array(rec_data['embeddings'][0])
+            rec_embedding = np.array(rec_data['embedding'][0])
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(
