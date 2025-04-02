@@ -192,17 +192,13 @@ class PlayerRecommendation:
         self.vector_db_players.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
     
     def get_player_by_id(self, id: str) -> Dict:
-        id = 'e06683ca'
         results = self.vector_db_players.get(where={"id": id})
     
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        embeddings = results.get("embeddings")
-        if embeddings and len(embeddings) > 0:
-            embedding = embeddings[0]
-        else:
-            embedding = "No embedding available"
+        description = results["documents"][0]
+        embedding = self.embedding_model.embed_query(description)
         
         return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': embedding}
     
@@ -212,7 +208,9 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0]}
+        description = results["documents"][0]
+        embedding = self.embedding_model.embed_query(description)
+        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': embedding}
 
     def get_team_by_name(self, name: str) -> Dict:
 
@@ -349,10 +347,10 @@ class PlayerRecommendation:
         # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
         player_data = self.get_player_by_id(id)
         print(player_data)
-        if not player_data or not player_data.get('embeddings'):
+        if not player_data or not player_data['embedding']:
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
         
-        player_embedding = np.array(player_data['embedding'][0])
+        player_embedding = np.array(player_data['embedding'])
 
         results = {}
         for rec_id in ids_rec:
@@ -362,7 +360,7 @@ class PlayerRecommendation:
                 results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
                 continue
             
-            rec_embedding = np.array(rec_data['embedding'][0])
+            rec_embedding = np.array(rec_data['embedding'])
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(
