@@ -383,7 +383,7 @@ class PlayerRecommendation:
             if id in ids_rec:
                 hit_rec+=1
             if id in ids_ret:
-                print(rec['player_name'])
+
                 hit_ret+=1
             
             similarity_rec = self.verify_similarity_in_rec(id, ids_rec)
