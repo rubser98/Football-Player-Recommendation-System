@@ -340,16 +340,20 @@ class PlayerRecommendation:
     
     def verify_similarity_in_rec(self, id, ids_rec, threshold=0.7):
         # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
-        player_embedding = self.vector_db_players.get_embedding(where={'id': id})    
-        if player_embedding is None:
+        player_data = self.vector_db_players.get(where={'id': id})
+        if not player_data or 'embeddings' not in player_data:
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
+        player_embedding = np.array(player_data['embeddings'][0])
+
         results = {}
         for rec_id in ids_rec:
-            rec_embedding = self.vector_db_players.get_embedding(where={'id': rec_id})
-            
-            if rec_embedding is None:
+            rec_data = self.vector_db_players.get(where={'id': rec_id})
+        
+            if not rec_data or 'embeddings' not in rec_data:
                 results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
                 continue
+            
+            rec_embedding = np.array(rec_data['embeddings'][0])
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(
@@ -387,16 +391,11 @@ class PlayerRecommendation:
 
         return eval
 
-        
-
-
-
-
     def main_recommendation(self, transfers_file):
 
         recommendations = []
         transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
-        
+        '''
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
@@ -411,7 +410,9 @@ class PlayerRecommendation:
 
                 pbar.update(1)
 
-        writeJson(recommendations, f'{self.dir}/recommendations.json')
+        writeJson(recommendations, f'{self.dir}/recommendations.json')'
+        '''
+        recommendations = readJson(f'{self.dir}/recommendations.json')
         eval = self.evaluate_recommendations(recommendations)
         writeJson(eval, f'{self.dir}/evaluation.json')
 
