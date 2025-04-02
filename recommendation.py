@@ -358,10 +358,12 @@ class PlayerRecommendation:
         results = {}
         for rec_id in ids_rec:
             rec_data = self.get_player_by_id(rec_id)
+            if 'error' in rec_data.keys():
+                continue
+
             if not rec_data or not rec_data['embedding']:
                 raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
-                results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
-                continue
+                
 
             rec_embedding = np.array(rec_data['embedding']).reshape(1, -1)
 
