@@ -350,6 +350,8 @@ class PlayerRecommendation:
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
         
         player_embedding = np.array(player_data['embedding'])
+        # Normalizzazione dell'embedding del giocatore acquistato
+        player_embedding = player_embedding / np.linalg.norm(player_embedding)
 
         results = {}
         for rec_id in ids_rec:
@@ -360,6 +362,8 @@ class PlayerRecommendation:
                 continue
             
             rec_embedding = np.array(rec_data['embedding'])
+            # Normalizzazione dell'embedding del giocatore raccomandato
+            rec_embedding = rec_embedding / np.linalg.norm(rec_embedding)
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(
