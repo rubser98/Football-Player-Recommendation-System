@@ -198,7 +198,13 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0]}
+        embeddings = results.get("embeddings")
+        if embeddings and len(embeddings) > 0:
+            embedding = embeddings[0]
+        else:
+            embedding = "No embedding available"
+        
+        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': embedding}
     
     def get_player_by_name(self, name: str) -> Dict:
         results = self.vector_db_players.get(where={"name": name})
