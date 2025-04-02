@@ -411,6 +411,8 @@ class PlayerRecommendation:
         print("Attributi disponibili nel database dei giocatori:")
         for key in sample_record.keys():
             print(f"- {key}")
+        
+        print(sample_record)
 
     def main_recommendation(self, transfers_file):
 
