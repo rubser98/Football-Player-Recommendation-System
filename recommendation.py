@@ -192,6 +192,7 @@ class PlayerRecommendation:
         self.vector_db_players.add_texts([d[0] for d in docs], metadatas=[d[1] for d in docs])
     
     def get_player_by_id(self, id: str) -> Dict:
+        id = 'e06683ca'
         results = self.vector_db_players.get(where={"id": id})
     
         if not results["documents"]:
