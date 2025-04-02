@@ -349,7 +349,7 @@ class PlayerRecommendation:
         if not player_data or not player_data['embedding']:
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
         
-        player_embedding = np.array(player_data['embedding'])
+        player_embedding = np.array(player_data['embedding']).reshape(1, -1)
         # Normalizzazione dell'embedding del giocatore acquistato
         player_embedding = player_embedding / np.linalg.norm(player_embedding)
 
@@ -361,14 +361,14 @@ class PlayerRecommendation:
                 results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
                 continue
             
-            rec_embedding = np.array(rec_data['embedding'])
+            rec_embedding = np.array(rec_data['embedding']).reshape(1, -1)
             # Normalizzazione dell'embedding del giocatore raccomandato
             rec_embedding = rec_embedding / np.linalg.norm(rec_embedding)
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(
-                np.array(player_embedding).reshape(1, -1),
-                np.array(rec_embedding).reshape(1, -1)
+                np.array(player_embedding),
+                np.array(rec_embedding)
             )[0][0]
             
             # Assegna 1 se supera la soglia, altrimenti 0
