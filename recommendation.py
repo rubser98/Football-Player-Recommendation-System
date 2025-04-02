@@ -439,7 +439,7 @@ class PlayerRecommendation:
 
         writeJson(recommendations, f'{self.dir}/recommendations.json')'
         '''
-        self.print_player_attributes()
+
         recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
         eval = self.evaluate_recommendations(recommendations)
         writeJson(eval, f'{self.dir}/evaluation.json')
