@@ -366,11 +366,8 @@ class PlayerRecommendation:
             rec_embedding = rec_embedding / np.linalg.norm(rec_embedding)
             
             # Calcola la similarità coseno
-            similarity = cosine_similarity(
-                np.array(player_embedding),
-                np.array(rec_embedding)
-            )[0][0]
-            
+            similarity = cosine_similarity(player_embedding,rec_embedding)[0][0]
+            print(f"ID {rec_id}: Similarità = {similarity}")
             # Assegna 1 se supera la soglia, altrimenti 0
             results[rec_id] = 1 if similarity >= threshold else 0
     
