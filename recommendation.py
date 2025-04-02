@@ -195,6 +195,7 @@ class PlayerRecommendation:
         results = self.vector_db_players.get(where={"id": id})
     
         if not results["documents"]:
+            print(id)
             return {"error": "Player not found"}
         
         description = results["documents"][0]
@@ -206,6 +207,7 @@ class PlayerRecommendation:
         results = self.vector_db_players.get(where={"name": name})
     
         if not results["documents"]:
+            print(id)
             return {"error": "Player not found"}
         
         description = results["documents"][0]
@@ -356,16 +358,13 @@ class PlayerRecommendation:
         results = {}
         for rec_id in ids_rec:
             rec_data = self.get_player_by_id(rec_id)
-            print(rec_data)
             if not rec_data or not rec_data['embedding']:
                 raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
                 results[rec_id] = 0  # Se non troviamo l'embedding, lo consideriamo non simile
                 continue
-            try:
-                rec_embedding = np.array(rec_data['embedding']).reshape(1, -1)
-            except:
-                print(rec_data)
-                raise KeyError('embedding')
+
+            rec_embedding = np.array(rec_data['embedding']).reshape(1, -1)
+
 
             # Normalizzazione dell'embedding del giocatore raccomandato
             rec_embedding = rec_embedding / np.linalg.norm(rec_embedding)
