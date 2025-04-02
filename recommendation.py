@@ -386,8 +386,8 @@ class PlayerRecommendation:
 
                 hit_ret+=1
             
-            similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.5)
-            similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.5)
+            similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.2)
+            similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.2)
             similarity[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
         
         eval = {}
