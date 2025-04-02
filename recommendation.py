@@ -368,7 +368,6 @@ class PlayerRecommendation:
             
             # Calcola la similarità coseno
             similarity = cosine_similarity(player_embedding,rec_embedding)[0][0]
-            print(f"ID {rec_id}: Similarità = {similarity}")
             # Assegna 1 se supera la soglia, altrimenti 0
             results[rec_id] = 1 if similarity >= threshold else 0
     
@@ -389,8 +388,8 @@ class PlayerRecommendation:
                 print('ret:', rec['id'], rec['player_name'])
                 hit_ret+=1
             
-            similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.2)
-            similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.2)
+            similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.9)
+            similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.9)
             similarity[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
         
         eval = {}
