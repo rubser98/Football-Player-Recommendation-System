@@ -198,7 +198,7 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': results["embedding"][0]}
+        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': results["embeddings"][0]}
     
     def get_player_by_name(self, name: str) -> Dict:
         results = self.vector_db_players.get(where={"name": name})
