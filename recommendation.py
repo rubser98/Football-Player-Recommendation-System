@@ -341,7 +341,8 @@ class PlayerRecommendation:
     def verify_similarity_in_rec(self, id, ids_rec, threshold=0.7):
         # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
         player_data = self.vector_db_players.get(where={'id': id})
-        if not player_data or 'embeddings' not in player_data:
+
+        if not player_data or not player_data.get('embeddings'):
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
         player_embedding = np.array(player_data['embeddings'][0])
 
