@@ -392,6 +392,25 @@ class PlayerRecommendation:
         eval['similarity'] = similarity
 
         return eval
+    
+    def print_player_attributes(self):
+        """Stampa tutti gli attributi presenti nel database dei giocatori."""
+        all_data = self.vector_db_players.get()
+        
+        if not all_data:
+            print("Il database dei giocatori è vuoto o non accessibile.")
+            return
+        
+        # Prendi il primo record per mostrare gli attributi disponibili
+        sample_record = all_data.get('metadatas', [{}])[0]
+
+        if not sample_record:
+            print("Nessun metadato trovato nei dati.")
+            return
+
+        print("Attributi disponibili nel database dei giocatori:")
+        for key in sample_record.keys():
+            print(f"- {key}")
 
     def main_recommendation(self, transfers_file):
 
@@ -414,9 +433,10 @@ class PlayerRecommendation:
 
         writeJson(recommendations, f'{self.dir}/recommendations.json')'
         '''
+        self.print_player_attributes()
         recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
-        eval = self.evaluate_recommendations(recommendations)
-        writeJson(eval, f'{self.dir}/evaluation.json')
+        #eval = self.evaluate_recommendations(recommendations)
+        #writeJson(eval, f'{self.dir}/evaluation.json')
 
 
 
