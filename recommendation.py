@@ -198,7 +198,7 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Player not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': results["embeddings"][0]}
+        return results['metadatas'][0] | {'description': results["documents"][0]}
     
     def get_player_by_name(self, name: str) -> Dict:
         results = self.vector_db_players.get(where={"name": name})
@@ -342,7 +342,7 @@ class PlayerRecommendation:
     def verify_similarity_in_rec(self, id, ids_rec, threshold=0.7):
         # Ottieni l'embedding del giocatore acquistato usando il filtro per ID
         player_data = self.get_player_by_id(id)
-
+        print(player_data)
         if not player_data or not player_data.get('embeddings'):
             raise ValueError(f"Embedding non trovato per il giocatore con ID {id}")
         
