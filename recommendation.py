@@ -222,7 +222,10 @@ class PlayerRecommendation:
         if not results["documents"]:
             return {"error": "Team not found"}
         
-        return results['metadatas'][0] | {'description': results["documents"][0]}
+        description = results["documents"][0]
+        embedding = self.embedding_model.embed_query(description)
+        
+        return results['metadatas'][0] | {'description': results["documents"][0], 'embedding': embedding}
 
     
     def initialize_teams_db(self):
@@ -309,6 +312,46 @@ class PlayerRecommendation:
             {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
             for p in top_players
         ]
+    
+    def get_similar_teams(self, team_name: str, top_k: int = 10):
+
+        team_profile = self.get_team_by_name(team_name)
+        team_desc = team_profile['description']
+
+        results =self.vector_db_teams.similarity_search(team_desc, k= top_k)
+        print(len(results))
+        print(results[0])
+
+
+
+
+    def retrieve_players_from_similar_teams(self,team_names: list, expanded_roles: str, role_prototype: str, top_k: int = 10):
+        
+        all_ids = self.vector_db_players.get()["ids"]
+
+        # Recupera i dati completi per gli ID
+        if all_ids:
+            all_data = self.vector_db_players.get(all_ids)
+        else:
+            return []
+        
+        # Filtra i giocatori che appartengono ai ruoli specificati
+        filtered_results = [
+            {
+                "id": all_data["metadatas"][i]["id"],
+                "name": all_data["metadatas"][i]["name"],
+                "description": all_data["documents"][i],
+                "role": all_data["metadatas"][i]["tm_role"]
+            }
+            for i in range(len(all_data["documents"]))
+            if all_data["metadatas"][i]["tm_role"] in expanded_roles
+            and all_data["metadatas"][i]['team'] in team_names
+        ]
+        
+        if not filtered_results:
+            return []
+
+
 
 
     def recommend_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> str:
@@ -428,7 +471,7 @@ class PlayerRecommendation:
     def main_recommendation(self, transfers_file):
 
         recommendations = []
-        transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
+        #transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
         '''
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
@@ -447,9 +490,11 @@ class PlayerRecommendation:
         writeJson(recommendations, f'{self.dir}/recommendations.json')'
         '''
 
-        recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
-        eval = self.evaluate_recommendations(recommendations)
-        writeJson(eval, f'{self.dir}/evaluation.json')
+        #recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
+        #eval = self.evaluate_recommendations(recommendations)
+        #writeJson(eval, f'{self.dir}/evaluation.json')
+
+        self.get_similar_teams('Milan')
 
 
 
