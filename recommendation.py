@@ -320,7 +320,7 @@ class PlayerRecommendation:
         results =self.vector_db_teams.similarity_search(team_desc, k= top_k+1)[1:]
         similar_teams = []
         for r in results:
-            similar_teams.append(r['metadata']['name'])
+            similar_teams.append(r[0]['metadata']['name'])
         
         print(similar_teams)
         return similar_teams
