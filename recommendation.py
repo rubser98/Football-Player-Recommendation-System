@@ -284,14 +284,18 @@ class PlayerRecommendation:
 
         return merged_list
 
-    def retrieve_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
+    def retrieve_players(self, team_name: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
         expanded_roles = self.related_positions['it'][role]
         expanded_roles.append(role)
 
+        team = self.get_team_by_name(team_name)
+
+        team_fb = team['name']
+
         ##Prototype player for target role generation
-        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
+        query = self.retrieval_chain.run(team_description=team['description'], player_role=role_filter).split('##Generated output:')[1]
         query = cleanDesc(query)
 
         # Step 1: Filtro per ruolo nel database
@@ -314,12 +318,12 @@ class PlayerRecommendation:
             }
             for i in range(len(all_data["documents"]))
             if all_data["metadatas"][i]["tm_role"] in expanded_roles
-            and all_data["metadatas"][i]['team'] != team_name
+            and all_data["metadatas"][i]['team'] != team_fb
         ]
         
         if not filtered_results:
             return []
-        
+
         similar_teams = self.get_similar_teams(team_name)
         
         similar_to_prototype = self.similarity_comparison_given_query(filtered_results, query, top_k)
@@ -356,9 +360,11 @@ class PlayerRecommendation:
         return similar_teams
 
 
-    def recommend_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> str:
+    def recommend_players(self, team_name: str, role: str, role_filter: str, top_k: int = 10) -> str:
         """Genera la classifica dei migliori giocatori per la squadra."""
-        retr_desc,retrieved_players = self.retrieve_players(team_desc, team_name, role, role_filter, top_k=top_k)
+
+        
+        retr_desc,retrieved_players = self.retrieve_players(team_name, role, role_filter, top_k=top_k)
         #retr_desc,retrieved_players = self.retrieve_players_without_filter(team_desc, role, role_filter, top_k=top_k)
         
         player_list = "\n".join([
@@ -366,7 +372,9 @@ class PlayerRecommendation:
             for p in retrieved_players
         ])
         
-        len(player_list)
+        team = self.get_team_by_name(team_name)
+        team_desc = team['description']
+        
         response = self.recommendation_chain.run(
             team_description=team_desc,
             player_role=role_filter,
@@ -484,7 +492,7 @@ class PlayerRecommendation:
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
-                retr_desc,response = self.recommend_players(team_desc['description'], team_desc['name'], t['tm_role'], t['tm_role_en'], top_k=20)
+                retr_desc,response = self.recommend_players(t['team'], t['tm_role'], t['tm_role_en'], top_k=20)
                 response = response.split('##Recommendation')
                 prompt = response[0]
                 rec = cleanDesc(response[1])
