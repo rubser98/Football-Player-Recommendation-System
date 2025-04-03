@@ -195,7 +195,7 @@ class PlayerRecommendation:
         results = self.vector_db_players.get(where={"id": id})
     
         if not results["documents"]:
-            print(id)
+            #print(id)
             return {"error": "Player not found"}
         
         description = results["documents"][0]
@@ -207,7 +207,7 @@ class PlayerRecommendation:
         results = self.vector_db_players.get(where={"name": name})
     
         if not results["documents"]:
-            print(id)
+            #print(id)
             return {"error": "Player not found"}
         
         description = results["documents"][0]
@@ -420,10 +420,10 @@ class PlayerRecommendation:
             id = rec['id']
             ids_rec, ids_ret = self.get_ids_recommendation(rec)
             if id in ids_rec:
-                print('rec:', rec['id'], rec['player_name'])
+                #print('rec:', rec['id'], rec['player_name'])
                 hit_rec+=1
             if id in ids_ret:
-                print('ret:', rec['id'], rec['player_name'])
+                #print('ret:', rec['id'], rec['player_name'])
                 hit_ret+=1
             
             similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.9)
