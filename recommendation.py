@@ -265,7 +265,7 @@ class PlayerRecommendation:
         # Step 5: Prendere i top_k più simili
         top_players = scored_results[:top_k]
 
-        return query, [
+        return [
             {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
             for p in top_players
         ]
