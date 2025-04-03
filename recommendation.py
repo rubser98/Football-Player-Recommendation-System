@@ -248,11 +248,39 @@ class PlayerRecommendation:
         return query,[{"id": p.metadata["id"], "name": p.metadata["name"], "description": p.page_content} for p in results]
     
 
+    def similarity_comparison_given_query(self, records: list, query: str, top_k: int = 10):
+
+        query_embedding = self.embedding_model.embed_query(cleanDesc(query))
+        filtered_embeddings = [
+        (cleanDesc(player["description"]), player, self.embedding_model.embed_query(cleanDesc(player["description"])))
+        for player in records]
+
+        # Step 4: Calcolo della similarità tra query e documenti filtrati
+        scored_results = sorted(
+            filtered_embeddings,
+            key=lambda x: cosine_similarity([query_embedding], [x[2]])[0][0], 
+            reverse=True
+        )
+
+        # Step 5: Prendere i top_k più simili
+        top_players = scored_results[:top_k]
+
+        return query, [
+            {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
+            for p in top_players
+        ]
+    
+
     def retrieve_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
         filtrando prima per il ruolo specificato e poi selezionando i top K più simili."""
         expanded_roles = self.related_positions['it'][role]
         expanded_roles.append(role)
+
+        ##Prototype player for target role generation
+        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
+        query = cleanDesc(query)
+
         # Step 1: Filtro per ruolo nel database
         #filtered_results = self.vector_db_players.get(where={"tm_role": role})
         all_ids = self.vector_db_players.get()["ids"]
@@ -279,39 +307,29 @@ class PlayerRecommendation:
         if not filtered_results:
             return []
         
-        ##Generated output:
-        query = self.retrieval_chain.run(team_description=team_desc, player_role=role_filter).split('##Generated output:')[1]
-        query = cleanDesc(query)
-        # Step 2: Creazione della query per la ricerca vettoriale
-        #query = f"{team_desc}. Looking for a {role_filter}."
-        query_embedding = self.embedding_model.embed_query(cleanDesc(query))
+        similar_teams = self.get_similar_teams(team_name)
         
-        # Step 3: Estrarre gli embeddings dei risultati filtrati
-        '''
-        filtered_embeddings = [
-            (cleanDesc(doc), meta, self.embedding_model.embed_query(cleanDesc(doc))) 
-            for doc, meta in zip(filtered_results["documents"], filtered_results["metadatas"])
+        similar_to_prototype = self.similarity_comparison_given_query(filtered_results, query, top_k)
+
+        filtered_results_cf = [
+            {
+                "id": all_data["metadatas"][i]["id"],
+                "name": all_data["metadatas"][i]["name"],
+                "description": all_data["documents"][i],
+                "role": all_data["metadatas"][i]["tm_role"]
+            }
+            for i in range(len(all_data["documents"]))
+            if all_data["metadatas"][i]["tm_role"] in expanded_roles
+            and all_data["metadatas"][i]['team'] in similar_teams
         ]
-        '''
-        filtered_embeddings = [
-        (cleanDesc(player["description"]), player, self.embedding_model.embed_query(cleanDesc(player["description"])))
-        for player in filtered_results]
+        
+        if not filtered_results_cf:
+            return []
 
+        cf_players = self.similarity_comparison_given_query(filtered_results_cf, query, top_k=10)
 
-        # Step 4: Calcolo della similarità tra query e documenti filtrati
-        scored_results = sorted(
-            filtered_embeddings,
-            key=lambda x: cosine_similarity([query_embedding], [x[2]])[0][0], 
-            reverse=True
-        )
-
-        # Step 5: Prendere i top_k più simili
-        top_players = scored_results[:top_k]
-
-        return query, [
-            {"id": p[1]["id"], "name": p[1]["name"], "description": p[0]} 
-            for p in top_players
-        ]
+        return similar_to_prototype | cf_players
+        
     
     def get_similar_teams(self, team_name: str, top_k: int = 20):
 
@@ -322,39 +340,7 @@ class PlayerRecommendation:
         for r in results:
             similar_teams.append(r.metadata['name'])
         
-        print(similar_teams)
         return similar_teams
-
-
-
-
-    def retrieve_players_from_similar_teams(self,team_names: list, expanded_roles: str, role_prototype: str, top_k: int = 10):
-        
-        all_ids = self.vector_db_players.get()["ids"]
-
-        # Recupera i dati completi per gli ID
-        if all_ids:
-            all_data = self.vector_db_players.get(all_ids)
-        else:
-            return []
-        
-        # Filtra i giocatori che appartengono ai ruoli specificati
-        filtered_results = [
-            {
-                "id": all_data["metadatas"][i]["id"],
-                "name": all_data["metadatas"][i]["name"],
-                "description": all_data["documents"][i],
-                "role": all_data["metadatas"][i]["tm_role"]
-            }
-            for i in range(len(all_data["documents"]))
-            if all_data["metadatas"][i]["tm_role"] in expanded_roles
-            and all_data["metadatas"][i]['team'] in team_names
-        ]
-        
-        if not filtered_results:
-            return []
-
-
 
 
     def recommend_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> str:
@@ -428,7 +414,8 @@ class PlayerRecommendation:
         n = len(recommendations)
         hit_rec = 0
         hit_ret = 0
-        similarity = {}
+        similarity_90 = {}
+        similarity_80 = {}
         for rec in recommendations:
             id = rec['id']
             ids_rec, ids_ret = self.get_ids_recommendation(rec)
@@ -439,14 +426,19 @@ class PlayerRecommendation:
                 print('ret:', rec['id'], rec['player_name'])
                 hit_ret+=1
             
+            similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.9)
+            similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.9)
+            similarity_90[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
+
             similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.8)
             similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.8)
-            similarity[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
+            similarity_90[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
         
         eval = {}
         eval['hit_rec'] = hit_rec
         eval['hit_ret'] = hit_ret
-        eval['similarity'] = similarity
+        eval['similarity_90'] = similarity_90
+        eval['similarity_80'] = similarity_80
 
         return eval
     
@@ -474,8 +466,8 @@ class PlayerRecommendation:
     def main_recommendation(self, transfers_file):
 
         recommendations = []
-        #transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
-        '''
+        transfers = readJson(f'{self.dir}/{transfers_file}')#[:20]
+        
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
                 team_desc = self.get_team_by_name(t['team'])
@@ -490,17 +482,11 @@ class PlayerRecommendation:
 
                 pbar.update(1)
 
-        writeJson(recommendations, f'{self.dir}/recommendations.json')'
-        '''
-
+        writeJson(recommendations, f'{self.dir}/recommendations_cf.json')
+        
         #recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
-        #eval = self.evaluate_recommendations(recommendations)
-        #writeJson(eval, f'{self.dir}/evaluation.json')
-
-        self.get_similar_teams('AC Milan')
-
-
-
+        eval = self.evaluate_recommendations(recommendations)
+        writeJson(eval, f'{self.dir}/evaluation_cf.json')
 
 
 if __name__ == '__main__':
