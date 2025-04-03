@@ -321,6 +321,7 @@ class PlayerRecommendation:
         results =self.vector_db_teams.similarity_search(team_desc, k= top_k+1)[1:]
         print(len(results))
         print(results[0])
+        print(results['metadata'][:]['name'])
 
 
 
