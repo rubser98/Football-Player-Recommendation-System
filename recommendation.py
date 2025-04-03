@@ -317,11 +317,13 @@ class PlayerRecommendation:
 
         team_profile = self.get_team_by_name(team_name)
         team_desc = team_profile['description']
-
         results =self.vector_db_teams.similarity_search(team_desc, k= top_k+1)[1:]
-        print(len(results))
-        print(results[0])
-        print(results['metadata'][:]['name'])
+        similar_teams = []
+        for r in results:
+            similar_teams.append(r['metadata']['name'])
+        
+        print(similar_teams)
+        return similar_teams
 
 
 
