@@ -104,6 +104,7 @@ class PlayerRecommendation:
             ##Output Guidelines:
             - Justifications must be concise (max **20 tokens**).  
             - Add [END_REPORT] at the end of the recommendation. 
+            - Recommendations must be 10!
 
             ## Input data:
             Team Description: {team_description}
@@ -374,7 +375,7 @@ class PlayerRecommendation:
         
         team = self.get_team_by_name(team_name)
         team_desc = team['description']
-        
+
         response = self.recommendation_chain.run(
             team_description=team_desc,
             player_role=role_filter,
