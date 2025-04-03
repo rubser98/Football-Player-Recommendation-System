@@ -494,7 +494,7 @@ class PlayerRecommendation:
         #eval = self.evaluate_recommendations(recommendations)
         #writeJson(eval, f'{self.dir}/evaluation.json')
 
-        self.get_similar_teams('Milan')
+        self.get_similar_teams('AC Milan')
 
 
 
