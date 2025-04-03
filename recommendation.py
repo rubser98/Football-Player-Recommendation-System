@@ -328,7 +328,7 @@ class PlayerRecommendation:
 
         cf_players = self.similarity_comparison_given_query(filtered_results_cf, query, top_k=10)
 
-        return similar_to_prototype | cf_players
+        return query, similar_to_prototype | cf_players
         
     
     def get_similar_teams(self, team_name: str, top_k: int = 20):
