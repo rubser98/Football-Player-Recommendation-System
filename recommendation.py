@@ -313,7 +313,7 @@ class PlayerRecommendation:
             for p in top_players
         ]
     
-    def get_similar_teams(self, team_name: str, top_k: int = 10):
+    def get_similar_teams(self, team_name: str, top_k: int = 20):
 
         team_profile = self.get_team_by_name(team_name)
         team_desc = team_profile['description']
