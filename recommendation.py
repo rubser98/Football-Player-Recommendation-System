@@ -157,6 +157,7 @@ class PlayerRecommendation:
             if tm_team.upper() == team.upper():
                 return self.team_mapping[tm_team]
         
+        print(team)
         raise KeyError("Team non trovato")
         
     
