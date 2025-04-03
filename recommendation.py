@@ -270,6 +270,18 @@ class PlayerRecommendation:
             for p in top_players
         ]
     
+    def merge_retrieved_players(self, retrieved_players, cf_players):
+        merged_list = [x for x in retrieved_players]
+        for cf in cf_players:
+            to_add = True
+            for retr in retrieved_players:
+                if cf['id'] == retr['id']:
+                    to_add = False
+            
+            if to_add:
+                merged_list.append(cf)
+
+        return merged_list
 
     def retrieve_players(self, team_desc: str, team_name: str, role: str, role_filter: str, top_k: int = 10) -> List[Dict]:
         """Recupera i giocatori più pertinenti alla descrizione della squadra e al ruolo richiesto,
@@ -328,7 +340,7 @@ class PlayerRecommendation:
 
         cf_players = self.similarity_comparison_given_query(filtered_results_cf, query, top_k=10)
 
-        return query, similar_to_prototype | cf_players
+        return query, self.merge_retrieved_players(similar_to_prototype, cf_players)
         
     
     def get_similar_teams(self, team_name: str, top_k: int = 20):
