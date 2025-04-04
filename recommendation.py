@@ -454,7 +454,7 @@ class PlayerRecommendation:
 
             similarity_rec = self.verify_similarity_in_rec(id, ids_rec, threshold=0.8)
             similarity_ret = self.verify_similarity_in_rec(id, ids_ret, threshold=0.8)
-            similarity_90[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
+            similarity_80[id] = {'recommendation': similarity_rec, 'retrieval': similarity_ret}
         
         eval = {}
         eval['hit_rec'] = hit_rec
@@ -486,13 +486,13 @@ class PlayerRecommendation:
         print(sample_record)
 
     def main_recommendation(self, transfers_file):
-
+        '''
         recommendations = []
         transfers = readJson(f'{self.dir}/{transfers_file}')
         
         with tqdm(total=len(transfers), desc="Processing recommendations") as pbar:   
             for t in transfers:
-                team_desc = self.get_team_by_name(t['team'])
+                #team_desc = self.get_team_by_name(t['team'])
                 retr_desc,response = self.recommend_players(t['team'], t['tm_role'], t['tm_role_en'], top_k=20)
                 response = response.split('##Recommendation')
                 prompt = response[0]
@@ -505,8 +505,8 @@ class PlayerRecommendation:
                 pbar.update(1)
 
         writeJson(recommendations, f'{self.dir}/recommendations_cf.json')
-        
-        #recommendations = readJson(f'{self.dir}/recommendations.json')[1:]
+        '''
+        recommendations = readJson(f'{self.dir}/recommendations_cf.json')
         eval = self.evaluate_recommendations(recommendations)
         writeJson(eval, f'{self.dir}/evaluation_cf.json')
 
