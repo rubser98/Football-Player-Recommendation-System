@@ -7,3 +7,4 @@ __pycache__
 Descriptions
 checkpoints
 dataset_exploration*
+neo4j_cred.json

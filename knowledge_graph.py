@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 import os
-from utils import readJson, writeJson
+from utils import readJson
 
 class KnowledgeGraphBuilder:
     def __init__(self, dir, uri, user, password):
@@ -48,9 +48,11 @@ class KnowledgeGraphBuilder:
 
 if __name__ == '__main__':
 
-    uri = 'neo4j+s://61936847.databases.neo4j.io'
-    user = 'neo4j'
-    password = '1Hh1u1url7OyGyY-rprbnUX6Kc4W25e4leG0WMEzrGY'
+    neo4j_cred = readJson('neo4j_cred.json')
+
+    uri = neo4j_cred['uri']
+    user = neo4j_cred['username']
+    password = neo4j_cred['password']
     kg_dir = 'Dataset/Knowledge_graph'
 
     kgb = KnowledgeGraphBuilder(kg_dir, uri, user, password)

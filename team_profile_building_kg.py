@@ -9,7 +9,7 @@ from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage
 from collections import defaultdict
-from utils import writeJson
+from utils import writeJson, readJson
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -94,6 +94,7 @@ class TeamProfiler:
         RETURN p.name AS player_name,
                p.preferred_position AS player_position,
                s.name AS skill_name,
+               s.description AS skill_description,
                type(r) AS skill_level,
                id(p) as player_id, // ID univoco per networkx
                id(s) as skill_id   // ID univoco per networkx
@@ -138,7 +139,7 @@ class TeamProfiler:
                 player_nodes.add(player_id)
 
             if record['skill_name'] and skill_id not in skill_nodes: # Assicurati che la skill esista
-                 B.add_node(skill_id, bipartite=1, name=record['skill_name'])
+                 B.add_node(skill_id, bipartite=1, name=record['skill_name'], description=record["skill_description"])
                  skill_nodes.add(skill_id)
 
             # Aggiungi arco pesato tra player e skill (se la skill esiste)
@@ -153,7 +154,6 @@ class TeamProfiler:
     def _run_bipartite_community_detection(self, B: nx.Graph, player_nodes: set):
         """
         Esegue l'algoritmo Louvain bipartito per trovare comunità di giocatori.
-        (CODICE IDENTICO ALLA VERSIONE PRECEDENTE, con piccola correzione)
         """
         if not B or B.number_of_edges() == 0 or not player_nodes: # Aggiunto controllo edges
             logging.warning("Grafo bipartito vuoto, senza archi o senza nodi Player. Impossibile eseguire community detection.")
@@ -207,7 +207,7 @@ class TeamProfiler:
                 "id": i + 1,
                 "members": [],
                 "positions": defaultdict(int),
-                "key_skills": defaultdict(lambda: {'count': 0, 'total_weight': 0, 'levels': defaultdict(int)})
+                "key_skills": defaultdict(lambda: {'count': 0, 'total_weight': 0, 'levels': defaultdict(int), 'description': 'No description available.'})
             }
             player_names_in_comm = set()
 
@@ -227,6 +227,7 @@ class TeamProfiler:
                 for neighbor_skill_id in B.neighbors(p_id):
                     if B.nodes[neighbor_skill_id]['bipartite'] == 1: # Assicurati sia una skill
                         skill_name = B.nodes[neighbor_skill_id]['name']
+                        skill_desc = node_data[neighbor_skill_id].get('description', '')
                         edge_data = B.get_edge_data(p_id, neighbor_skill_id)
                         level = edge_data.get('level', 'N/A')
                         weight = edge_data.get('weight', 0)
@@ -235,6 +236,8 @@ class TeamProfiler:
                         comm_data["key_skills"][skill_name]['count'] += 1
                         comm_data["key_skills"][skill_name]['total_weight'] += weight
                         comm_data["key_skills"][skill_name]['levels'][level] += 1
+                        if skill_desc:
+                            comm_data["key_skills"][skill_name]['description'] = skill_desc
 
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
             relevant_skills = {}
@@ -244,7 +247,10 @@ class TeamProfiler:
                     avg_weight = data['total_weight'] / data['count']
                      # Converti livelli in stringa leggibile
                     level_str = ", ".join([f"{lvl}: {cnt}" for lvl, cnt in data['levels'].items()])
-                    relevant_skills[skill] = f"Present in {data['count']}/{len(player_ids_in_comm)} members (Avg Weight: {avg_weight:.2f}, Levels: {level_str})"
+                    skill_description = data.get('description', 'No description available.')
+
+                    relevant_skills[skill] = {"summary": f"Present in {data['count']}/{len(player_ids_in_comm)} members (Avg Weight: {avg_weight:.2f}, Levels: {level_str})", 
+                                              "description": skill_description}
 
             comm_data["key_skills"] = relevant_skills # Sovrascrivi con le skill filtrate/formattate
             comm_data["positions"] = dict(comm_data["positions"]) # Converti defaultdict a dict
@@ -272,8 +278,12 @@ class TeamProfiler:
             context += f"Predominant Positions: {positions_str}\n"
             context += "Key Shared Skills (among these members):\n"
             if comm['key_skills']:
-                for skill, desc in sorted(comm['key_skills'].items()):
-                    context += f"- {skill}: {desc}\n"
+                for skill, details in sorted(comm['key_skills'].items()):
+                    # <-- Confermato: Formattazione include descrizione
+                    context += f"- {skill}: {details['summary']}"
+                    if details['description']:
+                        context += f" (Description: {details['description']})"
+                    context += "\n"
             else:
                 context += "- No relevant key skills detected based on criteria.\n"
             context += "\n"
@@ -290,7 +300,7 @@ class TeamProfiler:
         return context
 
     def _generate_profile_with_llm(self, context: str) -> str:
-        """Queries the local LLM (via LangChain) using ENGLISH prompts."""
+        
         if not context:
             return "Cannot generate profile: no community data available."
         if not self._llm:
@@ -364,18 +374,40 @@ class TeamProfiler:
 
         logging.info(f"Profile for '{team_name}' completed.")
         return final_profile
+    
+    def _save_team_profile_to_kg(self, team_name: str, profile_text: str):
+        """Saves the generated team profile text to the Team node in Neo4j."""
+        if not profile_text:
+             logging.warning(f"Skipping saving empty profile for team '{team_name}'.")
+             return
+
+        query = """
+        MATCH (t:team {name: $team_name})
+        SET t.profile_analysis_generated = $profile_text,
+            t.profile_last_updated = timestamp() // Aggiungi timestamp
+        """
+        params = {"team_name": team_name, "profile_text": profile_text}
+        try:
+            with self._driver.session() as session:
+                session.run(query, params)
+            logging.info(f"Saved generated profile to Neo4j for team '{team_name}'.")
+        except Exception as e:
+            logging.error(f"Error saving team profile to Neo4j for '{team_name}': {e}")
 
 
-# --- Esempio di Utilizzo ---
+
+
 if __name__ == "__main__":
     profiler = None # Inizializza a None
     try:
-        uri = 'neo4j+s://61936847.databases.neo4j.io'
-        user = 'neo4j'
-        password = '1Hh1u1url7OyGyY-rprbnUX6Kc4W25e4leG0WMEzrGY'
+        neo4j_cred = readJson('neo4j_cred.json')
+
+        uri = neo4j_cred['uri']
+        user = neo4j_cred['username']
+        password = neo4j_cred['password']
 
         profiler = TeamProfiler(uri, user, password)
-        team_to_analyze = "Milan" # <= SOSTITUISCI CON UN NOME VALIDO
+        team_to_analyze = "Milan" 
         profile = profiler.generate_team_profile(team_to_analyze)
         print("-" * 80)
         print(f"Profilo Generato per: {team_to_analyze}")
