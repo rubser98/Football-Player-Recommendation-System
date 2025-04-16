@@ -399,26 +399,21 @@ class TeamProfiler:
 
 if __name__ == "__main__":
     profiler = None # Inizializza a None
-    try:
-        neo4j_cred = readJson('neo4j_cred.json')
 
-        uri = neo4j_cred['uri']
-        user = neo4j_cred['username']
-        password = neo4j_cred['password']
+    neo4j_cred = readJson('neo4j_cred.json')
 
-        profiler = TeamProfiler(uri, user, password)
-        team_to_analyze = "Milan" 
-        profile = profiler.generate_team_profile(team_to_analyze)
-        print("-" * 80)
-        print(f"Profilo Generato per: {team_to_analyze}")
-        print("-" * 80)
-        writeJson({'Milan': profile}, 'Description/graph_team_profile.json')
+    uri = neo4j_cred['uri']
+    user = neo4j_cred['username']
+    password = neo4j_cred['password']
 
-    except ValueError as ve:
-         print(f"Errore di configurazione: {ve}")
-    except Exception as e:
-        print(f"Errore durante l'esecuzione del profiler: {e}")
-    finally:
-        if profiler:
-            profiler.close() # Assicurati di chiudere la connessione
+    profiler = TeamProfiler(uri, user, password)
+    team_to_analyze = "Milan" 
+    profile = profiler.generate_team_profile(team_to_analyze)
+    print("-" * 80)
+    print(f"Profilo Generato per: {team_to_analyze}")
+    print("-" * 80)
+    writeJson({'Milan': profile}, 'Description/graph_team_profile.json')
+
+
+    profiler.close() # Assicurati di chiudere la connessione
 
