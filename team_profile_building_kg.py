@@ -412,7 +412,7 @@ if __name__ == "__main__":
     print("-" * 80)
     print(f"Profilo Generato per: {team_to_analyze}")
     print("-" * 80)
-    writeJson({'Milan': profile}, 'Description/graph_team_profile.json')
+    writeJson({'Milan': profile}, 'Descriptions/graph_team_profile.json')
 
 
     profiler.close() # Assicurati di chiudere la connessione
