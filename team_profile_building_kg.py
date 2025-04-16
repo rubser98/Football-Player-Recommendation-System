@@ -88,7 +88,7 @@ class TeamProfiler:
         Restituisce una lista di dizionari con i dati delle relazioni Player-Skill.
         """
         query = """
-        MATCH (t:team {name: $team_name})<-[:PLAY_FOR]-(p:Player)
+        MATCH (t:team {name: $team_name})<-[:PLAY_FOR]-(p:player)
         OPTIONAL MATCH (p)-[r]->(s:skill)
         WHERE type(r) IN $skill_levels // Filtra solo per relazioni di skill
         RETURN p.name AS player_name,
