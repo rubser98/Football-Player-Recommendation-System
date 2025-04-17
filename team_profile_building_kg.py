@@ -233,7 +233,8 @@ class TeamProfiler:
                     for player in player_names_in_comm:
                         skill_desc = node_info.get('description', '')
                         edge_data = B.get_edge_data(player, p_id)
-                        print('funge:',player, p_id)
+                        print('non_funge:',player, p_id)
+                        break
                         level = edge_data.get('level', 'N/A')
                         weight = edge_data.get('weight', 0)
                         # Aggiorna conteggi e pesi per la skill in questa comunità
