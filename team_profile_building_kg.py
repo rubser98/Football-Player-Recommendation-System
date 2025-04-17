@@ -201,6 +201,7 @@ class TeamProfiler:
              return community_details
 
         node_data = B.nodes(data=True) # Ottieni dati dei nodi una sola volta
+        print(node_data)
 
         for i, player_ids_in_comm in enumerate(communities):
             comm_data = {
