@@ -214,12 +214,11 @@ class TeamProfiler:
             # Raccogli info sui membri e posizioni
             for p_id in player_ids_in_comm:
                 player_info = node_data[p_id]
-                print(player_info)
                 player_name = player_info.get('name', 'N/A')
                 player_pos = player_info.get('position', 'N/A')
-                comm_data["members"].append(player_name)
-                player_names_in_comm.add(player_name) # Set di nomi per ricerca skill
-                if player_pos:
+                if player_info['bipartite'] == 0:
+                    comm_data["members"].append(player_name)
+                    player_names_in_comm.add(player_name) # Set di nomi per ricerca skill
                     comm_data["positions"][player_pos] += 1
 
             # Raccogli info sulle skill associate ai membri della comunità
@@ -243,7 +242,7 @@ class TeamProfiler:
             
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
             relevant_skills = {}
-            min_players_with_skill = max(1, len(player_ids_in_comm) // 3) 
+            min_players_with_skill = max(1, len(player_ids_in_comm) // 2) 
             for skill, data in comm_data["key_skills"].items():
                 #print(skill, data)
                 if data['count'] >= min_players_with_skill:
