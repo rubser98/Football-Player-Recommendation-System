@@ -348,6 +348,9 @@ class TeamProfiler:
         2.  **Potential Weaknesses or Areas for Improvement:** Based on the community analysis (lack of certain key skills, low average levels even if shared), the potential absence of communities for crucial roles (e.g., if there's no strong community of finishing strikers), or the presence of many isolated players (which might indicate heterogeneity or lack of cohesion).
         3.  **Implied Playing Style:** If possible, infer a likely playing style based on the identified strengths (e.g., defensively solid team, technical midfield, fast wing play).
         Use clear, analytical language typical of a scouting report. Do not invent information not present in the provided context. Focus on analyzing the presented data.
+        Do not use player names in the scouting report.
+        Report must start with [START_REPORT] and [END_REPORT]
+        Do not use word "community" in the report. 
         """
 
         prompt = ChatPromptTemplate.from_messages([
