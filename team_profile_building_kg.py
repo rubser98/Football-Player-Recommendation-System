@@ -441,12 +441,12 @@ if __name__ == "__main__":
     password = neo4j_cred['password']
 
     profiler = TeamProfiler(uri, user, password)
-    team_to_analyze = "Milan" 
+    team_to_analyze = "Inter" 
     profile = profiler.generate_team_profile(team_to_analyze)
     print("-" * 80)
     print(f"Profilo Generato per: {team_to_analyze}")
     print("-" * 80)
-    writeJson({'Milan': profile}, 'Descriptions/graph_team_profile.json')
+    writeJson({'Inter': profile}, 'Descriptions/graph_team_profile.json')
 
 
     profiler.close() # Assicurati di chiudere la connessione
