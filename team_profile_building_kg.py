@@ -201,7 +201,6 @@ class TeamProfiler:
              return community_details
 
         node_data = B.nodes(data=True) # Ottieni dati dei nodi una sola volta
-        print(node_data)
 
         for i, player_ids_in_comm in enumerate(communities):
             comm_data = {
@@ -230,9 +229,9 @@ class TeamProfiler:
                 name = node_info.get('name', 'N/A')
 
                 if node_info['bipartite'] == 1:
-                    print(node_info)
+
                     for player in player_names_in_comm:
-                        skill_desc = node_data[name].get('description', '')
+                        skill_desc = node_info.get('description', '')
                         edge_data = B.get_edge_data(player, name)
                         level = edge_data.get('level', 'N/A')
                         weight = edge_data.get('weight', 0)
