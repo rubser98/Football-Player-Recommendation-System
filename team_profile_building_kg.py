@@ -236,15 +236,15 @@ class TeamProfiler:
                         try:
                             level = edge_data.get('level', 'N/A')
                             weight = edge_data.get('weight', 0)
-                        except:
-                            print('non_funge', name, node_data[player].get('name'))
-                            break
 
-                        # Aggiorna conteggi e pesi per la skill in questa comunità
-                        comm_data["key_skills"][name]['count'] += 1
-                        comm_data["key_skills"][name]['total_weight'] += weight
-                        comm_data["key_skills"][name]['levels'][level] += 1
-                        comm_data["key_skills"][name]['description'] = skill_desc
+
+                            # Aggiorna conteggi e pesi per la skill in questa comunità
+                            comm_data["key_skills"][name]['count'] += 1
+                            comm_data["key_skills"][name]['total_weight'] += weight
+                            comm_data["key_skills"][name]['levels'][level] += 1
+                            comm_data["key_skills"][name]['description'] = skill_desc
+                        except:
+                            continue
 
             '''
             # Raccogli info sulle skill associate ai membri della comunità
