@@ -243,6 +243,7 @@ class TeamProfiler:
             relevant_skills = {}
             min_players_with_skill = max(1, len(player_ids_in_comm) // 3) 
             for skill, data in comm_data["key_skills"].items():
+                print(skill, data)
                 if data['count'] >= min_players_with_skill:
                     avg_weight = data['total_weight'] / data['count']
                      # Converti livelli in stringa leggibile
