@@ -251,7 +251,7 @@ class TeamProfiler:
                     level_str = ", ".join([f"{lvl}: {cnt}" for lvl, cnt in data['levels'].items()])
                     skill_description = data.get('description', 'No description available.')
 
-                    relevant_skills[skill] = {"summary": f"Present in {data['count']}/{len(player_ids_in_comm)} members (Avg Weight: {avg_weight:.2f}, Levels: {level_str})", 
+                    relevant_skills[skill] = {"summary": f" members (Avg Weight: {avg_weight:.2f}, Levels: {level_str})", 
                                               "description": skill_description}
 
             comm_data["key_skills"] = relevant_skills # Sovrascrivi con le skill filtrate/formattate
