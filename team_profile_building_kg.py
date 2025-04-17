@@ -234,16 +234,20 @@ class TeamProfiler:
                         skill_desc = node_info.get('description', '')
                         edge_data = B.get_edge_data(player, p_id)
                         print('non_funge:',player, p_id)
-                        break
-                        level = edge_data.get('level', 'N/A')
-                        weight = edge_data.get('weight', 0)
+                        try:
+                            level = edge_data.get('level', 'N/A')
+                            weight = edge_data.get('weight', 0)
+                        except:
+                            print('non_funge', name, node_data[player].get('name'))
+                            break
+
                         # Aggiorna conteggi e pesi per la skill in questa comunità
                         comm_data["key_skills"][name]['count'] += 1
                         comm_data["key_skills"][name]['total_weight'] += weight
                         comm_data["key_skills"][name]['levels'][level] += 1
                         comm_data["key_skills"][name]['description'] = skill_desc
 
-            
+            '''
             # Raccogli info sulle skill associate ai membri della comunità
             for p_id in player_ids_in_comm:
                 # Trova skill collegate a questo giocatore nel grafo
@@ -263,7 +267,7 @@ class TeamProfiler:
                         comm_data["key_skills"][skill_name]['levels'][level] += 1
                         if skill_desc:
                             comm_data["key_skills"][skill_name]['description'] = skill_desc
-            
+            '''
 
             
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
