@@ -210,17 +210,37 @@ class TeamProfiler:
                 "key_skills": defaultdict(lambda: {'count': 0, 'total_weight': 0, 'levels': defaultdict(int), 'description': 'No description available.'})
             }
             player_names_in_comm = set()
+            
 
             # Raccogli info sui membri e posizioni
             for p_id in player_ids_in_comm:
-                player_info = node_data[p_id]
-                player_name = player_info.get('name', 'N/A')
-                player_pos = player_info.get('position', 'N/A')
-                if player_info['bipartite'] == 0:
-                    comm_data["members"].append(player_name)
-                    player_names_in_comm.add(player_name) # Set di nomi per ricerca skill
+                node_info = node_data[p_id]
+                name = node_info.get('name', 'N/A')
+                player_pos = node_info.get('position', 'N/A')
+
+                if node_info['bipartite'] == 0:
+                    comm_data["members"].append(name)
+                    player_names_in_comm.add(p_id) # Set di nomi per ricerca skill
                     comm_data["positions"][player_pos] += 1
 
+            for p_id in player_ids_in_comm:
+
+                node_info = node_data[p_id]
+                name = node_info.get('name', 'N/A')
+
+                if node_info['bipartite'] == 1:
+                    for player in player_names_in_comm:
+                        skill_desc = node_data[name].get('description', '')
+                        edge_data = B.get_edge_data(player, name)
+                        level = edge_data.get('level', 'N/A')
+                        weight = edge_data.get('weight', 0)
+                        # Aggiorna conteggi e pesi per la skill in questa comunità
+                        comm_data["key_skills"][name]['count'] += 1
+                        comm_data["key_skills"][name]['total_weight'] += weight
+                        comm_data["key_skills"][name]['levels'][level] += 1
+                        comm_data["key_skills"][name]['description'] = skill_desc
+
+            '''
             # Raccogli info sulle skill associate ai membri della comunità
             for p_id in player_ids_in_comm:
                 # Trova skill collegate a questo giocatore nel grafo
@@ -238,6 +258,7 @@ class TeamProfiler:
                         comm_data["key_skills"][skill_name]['levels'][level] += 1
                         if skill_desc:
                             comm_data["key_skills"][skill_name]['description'] = skill_desc
+            '''
 
             
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
@@ -251,7 +272,7 @@ class TeamProfiler:
                     level_str = ", ".join([f"{lvl}: {cnt}" for lvl, cnt in data['levels'].items()])
                     skill_description = data.get('description', 'No description available.')
 
-                    relevant_skills[skill] = {"summary": f" members (Avg Weight: {avg_weight:.2f}, Levels: {level_str})", 
+                    relevant_skills[skill] = {"summary": f"Avg Weight: {avg_weight:.2f}, Levels count: {level_str})", 
                                               "description": skill_description}
 
             comm_data["key_skills"] = relevant_skills # Sovrascrivi con le skill filtrate/formattate
