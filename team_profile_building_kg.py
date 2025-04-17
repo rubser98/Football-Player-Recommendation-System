@@ -241,7 +241,7 @@ class TeamProfiler:
 
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
             relevant_skills = {}
-            min_players_with_skill = max(1, len(player_ids_in_comm) // 2) # Esempio: almeno metà dei giocatori
+            min_players_with_skill = max(1, len(player_ids_in_comm) // 3) 
             for skill, data in comm_data["key_skills"].items():
                 if data['count'] >= min_players_with_skill:
                     avg_weight = data['total_weight'] / data['count']
