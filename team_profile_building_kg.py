@@ -56,7 +56,7 @@ class TeamProfiler:
             "text-generation",
             model=model,
             tokenizer=tokenizer,
-            max_new_tokens=1024, # Massimo numero di token da generare
+            max_new_tokens=2000, # Massimo numero di token da generare
             # Parametri aggiuntivi per la generazione (opzionali):
             temperature=0.7,
             # top_p=0.9,
@@ -441,12 +441,15 @@ if __name__ == "__main__":
     password = neo4j_cred['password']
 
     profiler = TeamProfiler(uri, user, password)
-    team_to_analyze = "Inter" 
-    profile = profiler.generate_team_profile(team_to_analyze)
-    print("-" * 80)
-    print(f"Profilo Generato per: {team_to_analyze}")
-    print("-" * 80)
-    writeJson({'Inter': profile}, 'Descriptions/graph_team_profile.json')
+    out_dict = {}
+    for team_to_analyze in ['Milan', 'Inter']:
+    
+        profile = profiler.generate_team_profile(team_to_analyze)
+        print("-" * 80)
+        print(f"Profilo Generato per: {team_to_analyze}")
+        print("-" * 80)
+        out_dict[team_to_analyze] = profile
+    writeJson(out_dict, 'Descriptions/graph_team_profile.json')
 
 
     profiler.close() # Assicurati di chiudere la connessione
