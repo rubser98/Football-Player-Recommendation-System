@@ -229,6 +229,7 @@ class TeamProfiler:
                 name = node_info.get('name', 'N/A')
 
                 if node_info['bipartite'] == 1:
+                    print(node_info)
                     for player in player_names_in_comm:
                         skill_desc = node_data[name].get('description', '')
                         edge_data = B.get_edge_data(player, name)
