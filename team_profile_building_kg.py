@@ -239,7 +239,7 @@ class TeamProfiler:
                         if skill_desc:
                             comm_data["key_skills"][skill_name]['description'] = skill_desc
 
-            print(player_names_in_comm)
+            print(comm_data["key_skills"])
             # Calcola skill più rilevanti (es. per peso medio o frequenza > soglia)
             relevant_skills = {}
             min_players_with_skill = max(1, len(player_ids_in_comm) // 3) 
