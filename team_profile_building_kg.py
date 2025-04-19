@@ -353,7 +353,7 @@ class TeamProfiler:
         Mandatory: Do not use player names in the scouting report.
         Mandatory: Report must start with [START_REPORT] and [END_REPORT]
         Mandatory: Do not use word "community" in the report. 
-        Mandatory: Do not use statistics in the report, use the description to generate discursive report. 
+        Mandatory: Do not use statistics in the report, use their description to generate discursive report. 
         Mandatory: Do not use words like EXCELLENT_IN
         """
 
