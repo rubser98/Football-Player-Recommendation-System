@@ -39,7 +39,7 @@ class TeamProfiler:
         model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 device_map="auto",  # Distribuisce automaticamente su GPU/CPU
-                load_in_8bit=load_in_8bit,
+                #load_in_8bit=load_in_8bit,
                 torch_dtype=torch.float16 if device == "cuda" else torch.float32, # float16 su GPU se possibile
                 # Aggiungi i parametri di offload se necessari e decommentati sopra:
                 # llm_int8_enable_fp32_cpu_offload=llm_int8_enable_fp32_cpu_offload,
