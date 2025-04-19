@@ -350,10 +350,11 @@ class TeamProfiler:
         
         ## Output Guidelines:
         Use clear, analytical language typical of a scouting report. Do not invent information not present in the provided context. Focus on analyzing the presented data.
-        Do not use player names in the scouting report.
-        Report must start with [START_REPORT] and [END_REPORT]
-        Do not use word "community" in the report. 
-        Do not use statistics in the report, use the description to generate discursive report. 
+        Mandatory: Do not use player names in the scouting report.
+        Mandatory: Report must start with [START_REPORT] and [END_REPORT]
+        Mandatory: Do not use word "community" in the report. 
+        Mandatory: Do not use statistics in the report, use the description to generate discursive report. 
+        Mandatory: Do not use words like EXCELLENT_IN
         """
 
         prompt = ChatPromptTemplate.from_messages([
