@@ -323,7 +323,7 @@ class TeamProfiler:
         context += "The following player communities were identified based on shared skills:\n\n"
         for comm in community_details:
             context += f"--- Community {comm['id']} ---\n"
-            context += f"Members ({len(comm['members'])}): {', '.join(sorted(comm['members']))}\n"
+            #context += f"Members ({len(comm['members'])}): {', '.join(sorted(comm['members']))}\n"
             positions_str = ", ".join([f"{pos} ({cnt})" for pos, cnt in sorted(comm['positions'].items())])
             context += f"Predominant Positions: {positions_str}\n"
             context += "Key Shared Skills (among these members):\n"
