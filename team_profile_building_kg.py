@@ -289,6 +289,25 @@ class TeamProfiler:
             community_details.append(comm_data)
 
         return community_details
+    
+    def _format_single_community_context(self, team_name: str, comm: dict) -> str:
+        context = f"Group of players from team: {team_name}\n"
+        context += f"Number of players: {len(comm['members'])}\n"
+        positions_str = ", ".join([f"{pos} ({cnt})" for pos, cnt in sorted(comm['positions'].items())])
+        context += f"Predominant Positions: {positions_str}\n"
+        context += "Key Shared Skills:\n"
+        
+        if comm['key_skills']:
+            for skill, details in sorted(comm['key_skills'].items()):
+                context += f"- {skill}: {details['summary']}"
+                if details['description']:
+                    context += f" (Description: {details['description']})"
+                context += "\n"
+        else:
+            context += "- No relevant key skills detected.\n"
+        
+        return context
+
 
     def _format_context_for_llm(self, team_name: str, community_details: list, all_players: list) -> str:
         """Formats the community detection results into ENGLISH text for the LLM."""
@@ -374,6 +393,92 @@ class TeamProfiler:
         except Exception as e:
             logging.error(f"Error during LangChain LLM chain invocation: {e}", exc_info=True)
             return f"Error generating LLM profile: {e}"
+    
+    
+        
+    def _generate_community_profile_with_llm(self, context: str) -> str:
+        if not context:
+            return "Cannot generate profile: no community data available."
+        if not self._llm:
+            return "Cannot generate profile: LLM not initialized."
+
+        system_prompt = """You are an expert football analyst tasked with analyzing groups of players based on shared skills.
+        You will be provided with a structured summary of a group of players who share similar skill profiles.
+        The group includes player count, predominant positions, and shared key skills.
+
+        Your task is to generate a brief scouting-style narrative that:
+        1. Describes the specialization of this group (e.g., creative midfielders, defensive fullbacks).
+        2. Identifies any interesting patterns (e.g., all fast players, mostly defensive skills).
+        3. Suggests what kind of tactical role such a group might serve in a team (e.g., high pressing, counter-attacks).
+
+        ## Output Guidelines:
+        - Use analytical, clear language.
+        - Do not mention player names.
+        - Do not use the word "community".
+        - Do not list statistics or skill levels explicitly.
+        - Keep it concise and focused (max 4-6 sentences).
+        """
+
+        prompt = ChatPromptTemplate.from_messages([
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=context)
+        ])
+
+        chain = prompt | self._llm
+
+        try:
+            response = chain.invoke({})
+            return response.strip()
+        except Exception as e:
+            logging.error(f"Error generating community description: {e}", exc_info=True)
+            return f"Error: {e}"
+    
+    def generate_profile_single_community(self, team_name: str):
+        """
+        Main method to generate the complete profile for a team with single community profile generation.
+        """
+        logging.info(f"Starting profile generation for team: {team_name}")
+
+        # 1. Extract raw data
+        subgraph_data = self._extract_team_subgraph_data(team_name)
+        if not subgraph_data:
+            return f"Cannot generate profile: No data found for team '{team_name}' in the database or no associated players/skills."
+
+        all_players_in_team = list(set(record['player_name'] for record in subgraph_data if record.get('player_name')))
+        if not all_players_in_team:
+             logging.warning(f"No valid player names found for team '{team_name}'.")
+
+        # 2. Build bipartite graph
+        B, player_nodes, skill_nodes = self._build_bipartite_graph(subgraph_data)
+        if not B or B.number_of_nodes() == 0:
+             return f"Cannot generate profile: Bipartite graph not created or empty for '{team_name}' (check extracted data)."
+        if B.number_of_edges() == 0:
+             logging.warning(f"Bipartite graph for '{team_name}' contains no Player-Skill edges. Profile might be limited.")
+
+        # 3. Run community detection
+        valid_player_nodes_for_comm = {p_node for p_node in player_nodes if p_node in B}
+        communities = self._run_bipartite_community_detection(B, valid_player_nodes_for_comm)
+
+        # 4. Extract community details
+        community_details = self._get_community_details(B, communities)
+
+        final_profile = {}
+
+        for comm in community_details:
+            comm_context = self._format_single_community_context(team_name, comm)
+            comm_description = self._generate_community_profile_with_llm(comm_context)
+            final_profile[comm['id']] = comm_description
+
+
+        # 5. Format context for LLM (Now in English)
+        #llm_context = self._format_context_for_llm(team_name, community_details, all_players_in_team)
+
+        # 6. Generate profile with LLM (Using English prompt)
+        #final_profile = self._generate_profile_with_llm(llm_context)
+
+        logging.info(f"Profile for '{team_name}' completed.")
+        return final_profile
+
 
     def generate_team_profile(self, team_name: str) -> str:
         """
@@ -447,8 +552,8 @@ if __name__ == "__main__":
     profiler = TeamProfiler(uri, user, password)
     out_dict = {}
     for team_to_analyze in ['Milan', 'Inter']:
-    
-        profile = profiler.generate_team_profile(team_to_analyze)
+        #profile = profiler.generate_team_profile(team_to_analyze)
+        profile = profiler.generate_profile_single_community(team_to_analyze)
         print("-" * 80)
         print(f"Profilo Generato per: {team_to_analyze}")
         print("-" * 80)
