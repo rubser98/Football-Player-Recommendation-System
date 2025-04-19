@@ -376,6 +376,27 @@ class TeamProfiler:
         Mandatory: Do not use words like EXCELLENT_IN
         """
 
+        system_prompt = """You are an expert football analyst tasked with analyzing teams based on structured data.
+        You will be provided with the results of a community detection analysis performed on a bipartite Player-Skill graph for a specific team.
+        Communities group players who share similar skills. The data includes members, predominant positions, and key shared skills for each community.
+        It also lists any players not belonging to a significant community.
+
+        Your task is to generate a narrative team profile highlighting:
+        1.  **Strengths:** Describe the team's specializations based on the most cohesive communities and their key skills (especially those with high levels like GOOD_IN, VERY_GOOD_IN, EXCELLENT_IN). Indicate which departments or types of play seem well-covered.
+        2.  **Potential Weaknesses or Areas for Improvement:** Based on the community analysis (lack of certain key skills, low average levels even if shared), the potential absence of communities for crucial roles (e.g., if there's no strong group of finishing strikers), or the presence of many isolated players (which might indicate heterogeneity or lack of cohesion).
+        3.  **Implied Playing Style:** If possible, infer a likely playing style based on the identified strengths (e.g., defensively solid team, technical midfield, fast wing play).
+        4.  **Recruitment Needs by Role:** Based on gaps or underrepresented skill sets, suggest what the team might be looking for in each main role (goalkeeper, defender, midfielder, forward). For each role, infer what kind of player profile would strengthen the team (e.g., "a forward with strong finishing and off-the-ball movement" or "a midfielder who can progress the ball under pressure").
+
+        ## Output Guidelines:
+        Use clear, analytical language typical of a scouting report. Do not invent information not present in the provided context. Focus on analyzing the presented data.
+        Mandatory: Do not use player names in the scouting report.
+        Mandatory: Report must start with [START_REPORT] and end with [END_REPORT]
+        Mandatory: Do not use the word "community" in the report. 
+        Mandatory: Do not use statistics in the report, use their description to generate discursive report. 
+        Mandatory: Do not use words like EXCELLENT_IN
+        """
+
+
         prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content=system_prompt),
             HumanMessage(content=context) # The actual data context
@@ -552,8 +573,8 @@ if __name__ == "__main__":
     profiler = TeamProfiler(uri, user, password)
     out_dict = {}
     for team_to_analyze in ['Milan', 'Inter']:
-        #profile = profiler.generate_team_profile(team_to_analyze)
-        profile = profiler.generate_profile_single_community(team_to_analyze)
+        profile = profiler.generate_team_profile(team_to_analyze)
+        #profile = profiler.generate_profile_single_community(team_to_analyze)
         print("-" * 80)
         print(f"Profilo Generato per: {team_to_analyze}")
         print("-" * 80)
