@@ -170,7 +170,7 @@ class TeamProfiler:
             # Nota: specificare i nodi del set "top" (i giocatori in questo caso)
             # Usiamo i nodi validi presenti nel grafo
             #communities_generator = nx_comm_bipartite.louvain_communities(B, nodes=valid_player_nodes, resolution=1.0) # Prova a variare la resolution
-            communities_generator = nx_comm_bipartite.louvain_communities(B,  resolution=1.1)
+            communities_generator = nx_comm_bipartite.louvain_communities(B,  resolution=1, threshold=1e-5)
             # Converti il generatore in una lista di set (ogni set è una comunità di player_id_nx)
             # Filtra comunità banali (singoli giocatori)
             communities = [set(comm) for comm in communities_generator if len(comm) > 1]
