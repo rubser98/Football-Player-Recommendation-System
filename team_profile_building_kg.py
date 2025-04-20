@@ -417,7 +417,7 @@ class TeamProfiler:
         Use **only the skills mentioned in the data** to infer the types of players that would fit the team's needs. Avoid speculation or general football clichés.
 
         Each player requirement must:
-        - Specify the role and suggested profile (e.g., left-footed ball-playing centre-back, creative winger who isolates defenders)
+        - Specify the role and suggested profile 
         - Include key skills the player should possess
         - Briefly explain how the profile fits the team context
 
