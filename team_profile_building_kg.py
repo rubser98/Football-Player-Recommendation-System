@@ -403,7 +403,7 @@ class TeamProfiler:
         Some players are also listed as isolated (i.e., not part of any meaningful group).
 
         Your task is to infer and write the **player requirements** for the team in the following roles:
-        - Central Defenders
+        - Defenders
         - Full-Backs
         - Midfielders
         - Wingers
@@ -413,6 +413,7 @@ class TeamProfiler:
         - Gaps or weaknesses observed in the available skillsets
         - Underrepresented or missing qualities by role
         - Reinforcement of strengths through complementary profiles
+        - Check if you put only trivial skills (e.g. Expected goals for forwards)
 
         Use **only the skills mentioned in the data** to infer the types of players that would fit the team's needs. Avoid speculation or general football clichés.
 
