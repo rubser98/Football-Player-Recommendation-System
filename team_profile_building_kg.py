@@ -422,6 +422,7 @@ class TeamProfiler:
         - Include key skills the player should possess
         - Briefly explain how the profile fits the team context
 
+        **Use at least 30 tokens for role profile**
         **Do not mention the word “community.”**  
         **Do not use player names.**  
         **Do not use statistics.**  
@@ -590,6 +591,48 @@ class TeamProfiler:
             logging.info(f"Saved generated profile to Neo4j for team '{team_name}'.")
         except Exception as e:
             logging.error(f"Error saving team profile to Neo4j for '{team_name}': {e}")
+        
+    def get_all_team_names(self):
+        """
+        Recupera una lista ordinata e unica di tutti i nomi delle squadre dal database Neo4j.
+
+        Args:
+            driver: Un'istanza del driver Neo4j correttamente configurata e connessa.
+                    (es. driver = GraphDatabase.driver(URI, auth=(USER, PASSWORD)))
+
+        Returns:
+            list: Una lista di stringhe contenente i nomi unici delle squadre,
+                ordinata alfabeticamente. Ritorna una lista vuota in caso di
+                errore o se non vengono trovate squadre.
+        """
+        team_names = []
+        # La query Cypher definita sopra
+        cypher_query = """
+        MATCH (t:team)
+        RETURN DISTINCT t.name AS team_name
+        ORDER BY team_name
+        """
+
+        try:
+            # Utilizza una sessione per interagire con il database
+            with self._driver.session() as session:
+                # Esegui la query all'interno di una transazione di lettura
+                # tx.run(query).data() restituisce una lista di dizionari
+                results = session.execute_read(lambda tx: tx.run(cypher_query).data())
+
+                # Estrai i nomi delle squadre dalla lista di risultati
+                for record in results:
+                    team_names.append(record["team_name"])
+
+                logging.info(f"Recuperati {len(team_names)} nomi di squadre dal database.")
+
+        except Exception as e:
+            logging.error(f"Errore durante il recupero dei nomi delle squadre: {e}", exc_info=True)
+            # Ritorna una lista vuota in caso di qualsiasi errore
+            return []
+
+        return team_names
+
 
 
 
@@ -605,7 +648,8 @@ if __name__ == "__main__":
 
     profiler = TeamProfiler(uri, user, password)
     out_dict = {}
-    for team_to_analyze in ['Milan', 'Inter']:
+    teams = profiler.get_all_team_names()
+    for team_to_analyze in teams:
         profile = profiler.generate_team_profile(team_to_analyze)
         #profile = profiler.generate_profile_single_community(team_to_analyze)
         print("-" * 80)
