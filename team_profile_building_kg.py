@@ -406,6 +406,7 @@ class TeamProfiler:
         - Defenders
         - Full-Backs
         - Midfielders
+        - Attacking midfielders
         - Wingers
         - Forwards
 
