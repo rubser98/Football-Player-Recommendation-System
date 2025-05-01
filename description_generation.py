@@ -40,7 +40,7 @@ if __name__ == '__main__':
         #filename = f'{args.dataset_dir}/team_description_{args.lang}.json'
         #filename = f'{args.dataset_dir}/prova_team.json'
         #filename = f'{args.dataset_dir}/team_descriptions.json'
-        filename = f'{args.dataset_dir}/team_descriptions_mancanti.json'
+        filename = f'{args.dataset_dir}/team_descriptions_v2.json'
 
     prompt_dataset= utils.readJson(filename)
 

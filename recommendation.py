@@ -29,8 +29,8 @@ class PlayerRecommendation:
         self.dir = dir
         # Database vettoriale (ChromaDB)
         
-        self.vector_db_players = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_players")
-        self.vector_db_teams = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_teams")
+        self.vector_db_players = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_players_v2")
+        self.vector_db_teams = Chroma(embedding_function=self.embedding_model, persist_directory="./chroma_teams_v2")
 
         if self.vector_db_players._collection.count() == 0:
             self.initialize_players_db()
@@ -163,8 +163,8 @@ class PlayerRecommendation:
         
     
     def initialize_players_db(self):
-        players_desc = readJson(f'{self.dir}/player_descriptions.json')
-        players_desc = players_desc | readJson(f'{self.dir}/player_descriptions_mancanti.json')
+        players_desc = readJson(f'{self.dir}/player_descriptions_v2.json')
+        #players_desc = players_desc | readJson(f'{self.dir}/player_descriptions_mancanti.json')
         player_meta = readJson(f'{self.dir}/transfermarkt_fbref_dataset.json')
         player_meta_manc = readJson(f'{self.dir}/transfermarkt_fbref_mancanti.json')
         #merge giocatori mancanti con dataset originale
@@ -231,8 +231,8 @@ class PlayerRecommendation:
 
     
     def initialize_teams_db(self):
-        teams = readJson(f'{self.dir}/team_descriptions.json')
-        teams = teams | readJson(f'{self.dir}/team_descriptions_mancanti.json')
+        teams = readJson(f'{self.dir}/team_descriptions_v2.json')
+        #teams = teams | readJson(f'{self.dir}/team_descriptions_mancanti.json')
         team_description = [t['description']['general'] for t in teams.values()]
         team_name = list(teams.keys())
         team_name = [{'name': x} for x in team_name]
@@ -486,7 +486,7 @@ class PlayerRecommendation:
         print(sample_record)
 
     def main_recommendation(self, transfers_file):
-        '''
+        
         recommendations = []
         transfers = readJson(f'{self.dir}/{transfers_file}')
         
@@ -504,11 +504,11 @@ class PlayerRecommendation:
 
                 pbar.update(1)
 
-        writeJson(recommendations, f'{self.dir}/recommendations_cf.json')
-        '''
-        recommendations = readJson(f'{self.dir}/recommendations_cf.json')
+        writeJson(recommendations, f'{self.dir}/recommendations_v2.json')
+        
+        #recommendations = readJson(f'{self.dir}/recommendations_cf.json')
         eval = self.evaluate_recommendations(recommendations)
-        writeJson(eval, f'{self.dir}/evaluation_cf.json')
+        writeJson(eval, f'{self.dir}/evaluation_v2.json')
 
 
 if __name__ == '__main__':
