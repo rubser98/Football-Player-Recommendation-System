@@ -22,9 +22,11 @@ The pipeline is structured into three main stages:
 - `transfermarkt_scraper.py`:
   - Scrapes market-related data from Transfermarkt.
 
+---
+
 ![Player Profile Pipeline](img/player_profile_pipeline.png)
 
----
+
 
 ## 2. 📝 Profile Generation with LLM
 
